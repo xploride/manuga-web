@@ -88,6 +88,7 @@ export default function Onboarding() {
   const [currentStep, setCurrentStep] = useState(0)
   const [answers, setAnswers] = useState({})
   const [isSaving, setIsSaving] = useState(false)
+  const [isAutoNavigating, setIsAutoNavigating] = useState(false)
 
   const question = QUESTIONS[currentStep]
   const isAnswered = answers[question.id] !== undefined && answers[question.id].length > 0
@@ -99,6 +100,16 @@ export default function Onboarding() {
         ...answers,
         [question.id]: [option],
       })
+      // 단일선택: 0.3초 후 자동으로 다음 문항으로 이동
+      setIsAutoNavigating(true)
+      setTimeout(() => {
+        if (isLastStep) {
+          handleComplete()
+        } else {
+          setCurrentStep(currentStep + 1)
+          setIsAutoNavigating(false)
+        }
+      }, 300)
     } else {
       const currentAnswers = answers[question.id] || []
       if (currentAnswers.includes(option)) {
@@ -115,26 +126,32 @@ export default function Onboarding() {
     }
   }
 
+  const handleComplete = async () => {
+    // 설문 완료 - 답변 저장 후 분석 결과로 이동
+    setIsSaving(true)
+
+    // Context에 저장
+    saveAnswers(answers)
+
+    // 분석 날짜 저장
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    const analysisDate = `${year}.${month}.${day}`
+    localStorage.setItem('lastAnalysisDate', analysisDate)
+
+    setIsSaving(false)
+    navigate('/analysis-result')
+  }
+
   const handleNext = async () => {
     if (isLastStep) {
-      // 설문 완료 - 답변 저장 후 분석 결과로 이동
-      setIsSaving(true)
-
-      // Context에 저장
-      saveAnswers(answers)
-
-      // 분석 날짜 저장
-      const today = new Date()
-      const year = today.getFullYear()
-      const month = String(today.getMonth() + 1).padStart(2, '0')
-      const day = String(today.getDate()).padStart(2, '0')
-      const analysisDate = `${year}.${month}.${day}`
-      localStorage.setItem('lastAnalysisDate', analysisDate)
-
-      setIsSaving(false)
-      navigate('/analysis-result')
+      // 복수선택 마지막 문항에서 "다음" 버튼 클릭
+      await handleComplete()
     } else {
       setCurrentStep(currentStep + 1)
+      setIsAutoNavigating(false)
     }
   }
 
@@ -206,23 +223,33 @@ export default function Onboarding() {
         <div className="border-t border-stone-100 bg-white px-5 py-4 flex gap-3">
           <button
             onClick={handlePrev}
-            disabled={currentStep === 0}
+            disabled={currentStep === 0 || isAutoNavigating}
             className="flex-1 py-3 rounded-2xl border-2 border-stone-200 text-stone-500 font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:border-stone-300"
           >
             이전
           </button>
-          <button
-            onClick={handleNext}
-            disabled={!isAnswered}
-            className={`flex-1 py-3 rounded-2xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
-              isAnswered
-                ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                : 'bg-stone-100 text-stone-400 cursor-not-allowed'
-            }`}
-          >
-            {isLastStep ? '완료' : '다음'}
-            {!isLastStep && <ChevronRight className="w-4 h-4" />}
-          </button>
+          {question.type === "multi" && (
+            <button
+              onClick={handleNext}
+              disabled={!isAnswered || isSaving}
+              className={`flex-1 py-3 rounded-2xl font-semibold text-sm transition-colors flex items-center justify-center gap-2 ${
+                isAnswered && !isSaving
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                  : 'bg-stone-100 text-stone-400 cursor-not-allowed'
+              }`}
+            >
+              {isLastStep ? '완료' : '다음'}
+              {!isLastStep && <ChevronRight className="w-4 h-4" />}
+            </button>
+          )}
+          {question.type === "single" && (
+            <button
+              disabled={true}
+              className="flex-1 py-3 rounded-2xl bg-stone-100 text-stone-400 font-semibold text-sm cursor-not-allowed"
+            >
+              자동 진행 중...
+            </button>
+          )}
         </div>
       </div>
     </div>
