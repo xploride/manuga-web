@@ -8,7 +8,7 @@ export default function RootGuard() {
   useEffect(() => {
     const onboardingAnswers = localStorage.getItem('onboardingAnswers')
     if (!onboardingAnswers) {
-      navigate('/onboarding', { replace: true })
+      navigate('/welcome', { replace: true })
     }
   }, [navigate])
 

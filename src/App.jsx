@@ -9,6 +9,7 @@ import Cabinet from './pages/Cabinet'
 import CabinetDetail from './pages/CabinetDetail'
 import AddNutrient from './pages/AddNutrient'
 import Onboarding from './pages/Onboarding'
+import Welcome from './pages/Welcome'
 import BottomNav from './components/BottomNav'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
 
   return (
     <Routes>
+      <Route path="/welcome" element={<Welcome />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route
         path="*"
