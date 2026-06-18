@@ -6,15 +6,32 @@ import { calculateAnalysis, getCategoryDetails } from '../utils/analysisEngine'
 export default function AnalysisResult() {
   const navigate = useNavigate()
   const [analysisData, setAnalysisData] = useState(null)
+  const [lastAnalysisDate, setLastAnalysisDate] = useState('-')
 
   useEffect(() => {
     // localStorage에서 설문 답변 가져오기
     const answersStr = localStorage.getItem('onboardingAnswers')
+    const analysisDateStr = localStorage.getItem('lastAnalysisDate')
+
     if (answersStr) {
       try {
         const answers = JSON.parse(answersStr)
         const result = calculateAnalysis(answers)
         setAnalysisData(result)
+
+        // 분석 날짜 설정
+        if (analysisDateStr) {
+          setLastAnalysisDate(analysisDateStr)
+        } else {
+          // 기존 저장된 날짜가 없으면 오늘 날짜로 설정
+          const today = new Date()
+          const year = today.getFullYear()
+          const month = String(today.getMonth() + 1).padStart(2, '0')
+          const day = String(today.getDate()).padStart(2, '0')
+          const todayDate = `${year}.${month}.${day}`
+          setLastAnalysisDate(todayDate)
+          localStorage.setItem('lastAnalysisDate', todayDate)
+        }
       } catch (error) {
         console.error('분석 데이터 로드 실패:', error)
         // 샘플 데이터로 폴백
@@ -37,8 +54,6 @@ export default function AnalysisResult() {
       </div>
     )
   }
-
-  const lastAnalysisDate = new Date().toISOString().split('T')[0].replace(/-/g, '.')
 
   return (
     <>
