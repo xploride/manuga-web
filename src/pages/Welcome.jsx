@@ -32,40 +32,39 @@ export default function Welcome() {
   }, [step])
 
   return (
-    <div className="min-h-screen bg-stone-50 flex flex-col items-center">
-      {/* Logo - 고정 위치 (상단 1/4 지점) */}
-      <div className="pt-20 flex items-center gap-3 justify-center">
-        <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-          <Leaf className="w-6 h-6 text-emerald-600" />
-        </div>
-        <span className="text-2xl font-bold text-emerald-700 tracking-tight">MANUGA</span>
-      </div>
-
-      {/* Message Sequence or Final Screen */}
+    <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center">
+      {/* Message Sequence or Final Screen - 중앙 배치 */}
       {step < MESSAGES.length ? (
-        // 메시지 시퀀스 - 고정 높이 컨테이너
-        <div className="flex-1 flex items-center justify-center w-full px-8">
-          <div className="h-24 flex items-center justify-center">
-            <div
-              className="text-xl text-stone-800 font-semibold text-center transition-opacity duration-500"
-              style={{ opacity }}
-            >
-              {MESSAGES[step]}
-            </div>
+        // 메시지 시퀀스 - 중앙에 페이드인/아웃
+        <div className="h-24 flex items-center justify-center px-8 w-full">
+          <div
+            className="text-xl text-stone-800 font-semibold text-center transition-opacity duration-500"
+            style={{ opacity }}
+          >
+            {MESSAGES[step]}
           </div>
         </div>
       ) : (
-        // 최종 화면
-        <div className="flex-1 flex flex-col items-center justify-center w-full px-8">
-          <p className="text-lg text-stone-700 font-medium mb-auto mt-12">
+        // 최종 화면 - 로고 + 텍스트 한 덩어리로 중앙 배치
+        <div className="flex flex-col items-center gap-3">
+          {/* Logo */}
+          <div className="flex items-center gap-3 justify-center">
+            <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+              <Leaf className="w-6 h-6 text-emerald-600" />
+            </div>
+            <span className="text-2xl font-bold text-emerald-700 tracking-tight">MANUGA</span>
+          </div>
+
+          {/* Text */}
+          <p className="text-lg text-stone-700 font-medium">
             1분이면 충분해요
           </p>
         </div>
       )}
 
-      {/* Start Button - 하단 고정 */}
+      {/* Start Button - 최종 화면에서만 보임, 콘텐츠 아래에 자연스럽게 */}
       {step >= MESSAGES.length && (
-        <div className="w-full px-8 pb-8 max-w-sm mx-auto">
+        <div className="w-full px-8 max-w-sm mx-auto mt-12 pb-12">
           <button
             onClick={() => navigate('/onboarding')}
             className="w-full py-3 rounded-2xl bg-emerald-600 text-white font-semibold text-base hover:bg-emerald-700 transition-colors"
