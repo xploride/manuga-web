@@ -45,8 +45,13 @@ export default function AnalysisReport() {
     }
   }, [])
 
-  const handleAddToCabinet = (nutrientName) => {
-    addItem(nutrientName)
+  const handleAddToCabinet = (nutrientName, category, reasons) => {
+    const metadata = {
+      source: 'analysis',
+      category: category,
+      reason: reasons && reasons.length > 0 ? reasons[0].source : '',
+    }
+    addItem(nutrientName, metadata)
   }
 
   return (
@@ -126,7 +131,7 @@ export default function AnalysisReport() {
 
                 {/* Add to Cabinet Button */}
                 <button
-                  onClick={() => handleAddToCabinet(category.mainNutrient)}
+                  onClick={() => handleAddToCabinet(category.mainNutrient, category.label, category.reasonList)}
                   disabled={isAdded}
                   className={`w-full py-3 rounded-2xl font-semibold text-sm transition-colors ${
                     isAdded

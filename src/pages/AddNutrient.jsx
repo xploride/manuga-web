@@ -101,7 +101,7 @@ export default function AddNutrient() {
                     {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </button>
                   <button
-                    onClick={() => addItem(name)}
+                    onClick={() => addItem(name, { source: 'manual' })}
                     disabled={added}
                     className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
                       added ? 'bg-emerald-100 text-emerald-600' : 'bg-stone-100 text-stone-500 hover:bg-emerald-100 hover:text-emerald-600'

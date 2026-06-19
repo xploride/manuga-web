@@ -40,12 +40,15 @@ export function CabinetProvider({ children }) {
     setIsLoading(false)
   }, [])
 
-  const addItem = (name) => {
+  const addItem = (name, metadata = {}) => {
     if (!cabinetItems.find((item) => item.name === name)) {
       const newItem = {
         name,
         addedAt: getTodayDate(),
         memo: '',
+        source: metadata.source || 'manual',
+        ...(metadata.category && { category: metadata.category }),
+        ...(metadata.reason && { reason: metadata.reason }),
       }
       const updatedItems = [...cabinetItems, newItem]
       setCabinetItems(updatedItems)

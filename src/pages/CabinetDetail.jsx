@@ -29,11 +29,13 @@ export default function CabinetDetail() {
   const decodedName = nutrientName ? decodeURIComponent(nutrientName) : ""
 
   // 캐비닛 항목 찾기
+  const [item, setItem] = useState(null)
   useEffect(() => {
-    const item = cabinetItems.find((i) => i.name === decodedName)
-    if (item) {
-      setAddedAt(item.addedAt)
-      setMemo(item.memo)
+    const foundItem = cabinetItems.find((i) => i.name === decodedName)
+    if (foundItem) {
+      setItem(foundItem)
+      setAddedAt(foundItem.addedAt)
+      setMemo(foundItem.memo)
     }
   }, [decodedName, cabinetItems])
 
@@ -89,6 +91,21 @@ export default function CabinetDetail() {
           <div className="bg-emerald-50 rounded-2xl p-4 mb-3">
             <p className="text-xs font-semibold text-emerald-600 mb-1.5">정보</p>
             <p className="text-sm text-emerald-800 leading-relaxed">{NUTRIENT_CONTENT[decodedName].description}</p>
+          </div>
+        )}
+
+        {/* Source Tag */}
+        {item && (
+          <div className="mb-3">
+            {item.source === 'analysis' ? (
+              <span className="inline-block bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full px-3 py-1">
+                분석 추천 · {item.category}
+              </span>
+            ) : (
+              <span className="inline-block bg-stone-100 text-stone-600 text-xs font-semibold rounded-full px-3 py-1">
+                직접 추가
+              </span>
+            )}
           </div>
         )}
 

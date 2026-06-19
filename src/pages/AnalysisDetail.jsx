@@ -61,7 +61,12 @@ export default function AnalysisDetail() {
   const isAdded = cabinetItems.some((item) => item.name === categoryDetails.mainNutrient)
 
   const handleAddToCabinet = () => {
-    addItem(categoryDetails.mainNutrient)
+    const metadata = {
+      source: 'analysis',
+      category: categoryDetails.label,
+      reason: categoryReasons.length > 0 ? categoryReasons[0].source : '',
+    }
+    addItem(categoryDetails.mainNutrient, metadata)
   }
 
   return (

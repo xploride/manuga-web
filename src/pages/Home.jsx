@@ -14,11 +14,51 @@ const NUTRIENT_STYLE = {
   "단백질": { icon: "⚡", bg: "bg-rose-50", color: "text-rose-500" },
 }
 
+function getTodayDateString() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function getYesterdayDateString() {
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const year = yesterday.getFullYear()
+  const month = String(yesterday.getMonth() + 1).padStart(2, '0')
+  const day = String(yesterday.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function calculateStreak(streakDates) {
+  if (!streakDates || streakDates.length === 0) return 0
+
+  const today = getTodayDateString()
+  const sortedDates = [...streakDates].sort().reverse()
+
+  let streak = 0
+  let currentDate = new Date(today)
+
+  for (const dateStr of sortedDates) {
+    const checkDate = new Date(dateStr)
+    const expectedDate = new Date(currentDate)
+
+    if (checkDate.getTime() === expectedDate.getTime()) {
+      streak++
+      currentDate.setDate(currentDate.getDate() - 1)
+    } else if (checkDate.getTime() < expectedDate.getTime()) {
+      break
+    }
+  }
+
+  return streak
+}
+
 export default function Home() {
   const { cabinetItems } = useCabinet()
   const [homeItems, setHomeItems] = useState([])
-
-  const streakDays = 12
+  const [streakDays, setStreakDays] = useState(0)
 
   // 캐비닛 항목이 변경될 때 및 마운트될 때 초기화
   useEffect(() => {
@@ -31,6 +71,11 @@ export default function Home() {
       checked: checks[item.name] || false,
     }))
     setHomeItems(items)
+
+    // 스트릭 계산
+    const streakDates = JSON.parse(localStorage.getItem('streakDates') || '[]')
+    const streak = calculateStreak(streakDates)
+    setStreakDays(streak)
   }, [cabinetItems])
 
   const toggleHomeItem = (id) => {
@@ -42,6 +87,22 @@ export default function Home() {
         checks[item.name] = item.checked
       })
       localStorage.setItem('homeChecks', JSON.stringify(checks))
+
+      // 하나라도 체크되면 오늘 날짜를 streakDates에 추가
+      const checkedAny = updated.some((item) => item.checked)
+      if (checkedAny) {
+        const streakDates = JSON.parse(localStorage.getItem('streakDates') || '[]')
+        const today = getTodayDateString()
+        if (!streakDates.includes(today)) {
+          streakDates.push(today)
+          localStorage.setItem('streakDates', JSON.stringify(streakDates))
+
+          // 스트릭 재계산
+          const streak = calculateStreak(streakDates)
+          setStreakDays(streak)
+        }
+      }
+
       return updated
     })
   }
