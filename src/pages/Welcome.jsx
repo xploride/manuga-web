@@ -38,20 +38,38 @@ export default function Welcome() {
   return (
     <div className="min-h-screen bg-stone-50 flex flex-col items-center relative">
       {step < MESSAGES.length ? (
-        // 메시지 시퀀스 - 절대 위치로 배치
-        <>
-          {/* 시퀀스 텍스트: 상단 37% 지점 */}
-          <div className="absolute left-0 right-0 px-8 w-full" style={{ top: '37%' }}>
-            <div
-              className="text-center transition-opacity duration-500"
-              style={{ opacity }}
-            >
-              {MESSAGES[step]}
+        // 메시지 시퀀스만 표시 (버튼 없음)
+        <div className="absolute left-0 right-0 px-8 w-full" style={{ top: '37%' }}>
+          <div
+            className="text-center transition-opacity duration-500"
+            style={{ opacity }}
+          >
+            {MESSAGES[step]}
+          </div>
+        </div>
+      ) : (
+        // 최종 화면 - 절대 위치로 배치
+        <div className="relative w-full min-h-screen">
+          {/* 로고 + 텍스트: 상단 35% 지점 */}
+          <div className="absolute left-0 right-0 w-full px-6" style={{ top: '35%' }}>
+            <div className="flex flex-col items-center gap-3">
+              {/* Logo */}
+              <div className="flex items-center gap-3 justify-center">
+                <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                  <Leaf className="w-8 h-8 text-emerald-600" />
+                </div>
+                <span className="text-3xl font-bold text-emerald-700 tracking-tight">MANUGA</span>
+              </div>
+
+              {/* Text */}
+              <p className="text-stone-600 text-base">
+                1분이면 충분해요
+              </p>
             </div>
           </div>
 
-          {/* 시작하기 버튼: 하단 37% 지점 */}
-          <div className="absolute left-0 right-0 px-6 w-full" style={{ bottom: '37%' }}>
+          {/* Button: 상단 60% 지점 */}
+          <div className="absolute left-0 right-0 px-6 w-full" style={{ top: '60%' }}>
             <div className="max-w-sm mx-auto">
               <button
                 onClick={() => navigate('/onboarding')}
@@ -60,32 +78,6 @@ export default function Welcome() {
                 시작하기
               </button>
             </div>
-          </div>
-        </>
-      ) : (
-        // 최종 화면 - 로고 + 텍스트를 화면 세로 40% 지점에 배치
-        <div className="flex-1 flex flex-col items-center justify-start pt-40 w-full">
-          <div className="flex flex-col items-center gap-3 w-full px-6">
-            {/* Logo */}
-            <div className="flex items-center gap-3 justify-center">
-              <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                <Leaf className="w-8 h-8 text-emerald-600" />
-              </div>
-              <span className="text-3xl font-bold text-emerald-700 tracking-tight">MANUGA</span>
-            </div>
-
-            {/* Text */}
-            <p className="text-stone-600 text-base">
-              1분이면 충분해요
-            </p>
-
-            {/* Button */}
-            <button
-              onClick={() => navigate('/onboarding')}
-              className="mt-12 w-full py-3 rounded-2xl bg-emerald-600 text-white font-semibold text-base hover:bg-emerald-700 transition-colors"
-            >
-              시작하기
-            </button>
           </div>
         </div>
       )}
