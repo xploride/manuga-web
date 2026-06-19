@@ -36,18 +36,32 @@ export default function Welcome() {
   }, [step])
 
   return (
-    <div className="min-h-screen bg-stone-50 flex flex-col items-center">
-      {/* Message Sequence or Final Screen */}
+    <div className="min-h-screen bg-stone-50 flex flex-col items-center relative">
       {step < MESSAGES.length ? (
-        // 메시지 시퀀스 - 중앙에 페이드인/아웃
-        <div className="flex-1 h-32 flex items-center justify-center px-8 w-full">
-          <div
-            className="text-center transition-opacity duration-500"
-            style={{ opacity }}
-          >
-            {MESSAGES[step]}
+        // 메시지 시퀀스 - 절대 위치로 배치
+        <>
+          {/* 시퀀스 텍스트: 상단 37% 지점 */}
+          <div className="absolute left-0 right-0 px-8 w-full" style={{ top: '37%' }}>
+            <div
+              className="text-center transition-opacity duration-500"
+              style={{ opacity }}
+            >
+              {MESSAGES[step]}
+            </div>
           </div>
-        </div>
+
+          {/* 시작하기 버튼: 하단 37% 지점 */}
+          <div className="absolute left-0 right-0 px-6 w-full" style={{ bottom: '37%' }}>
+            <div className="max-w-sm mx-auto">
+              <button
+                onClick={() => navigate('/onboarding')}
+                className="w-full py-3 rounded-2xl bg-emerald-600 text-white font-semibold text-base hover:bg-emerald-700 transition-colors"
+              >
+                시작하기
+              </button>
+            </div>
+          </div>
+        </>
       ) : (
         // 최종 화면 - 로고 + 텍스트를 화면 세로 40% 지점에 배치
         <div className="flex-1 flex flex-col items-center justify-start pt-40 w-full">
