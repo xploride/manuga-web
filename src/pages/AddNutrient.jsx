@@ -8,7 +8,7 @@ const NUTRIENT_STYLE = {
   "비타민B군": { icon: "⚡", bg: "bg-emerald-50", color: "text-emerald-600" },
   "비타민D": { icon: "☀️", bg: "bg-amber-50", color: "text-amber-500" },
   "오메가3": { icon: "💧", bg: "bg-blue-50", color: "text-blue-500" },
-  "비타민C": { icon: "⚡", bg: "bg-orange-50", color: "text-orange-500" },
+  "비타민C": { icon: "🍊", bg: "bg-orange-50", color: "text-orange-500" },
   "루테인": { icon: "👁️", bg: "bg-emerald-50", color: "text-emerald-600" },
   "유산균": { icon: "💧", bg: "bg-purple-50", color: "text-purple-500" },
   "마그네슘": { icon: "🌙", bg: "bg-indigo-50", color: "text-indigo-500" },

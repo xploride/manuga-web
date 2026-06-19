@@ -19,23 +19,30 @@ export function CabinetProvider({ children }) {
     const savedItems = localStorage.getItem('cabinetItems')
     if (savedItems) {
       try {
-        setCabinetItems(JSON.parse(savedItems))
+        const parsed = JSON.parse(savedItems)
+
+        // 데이터 마이그레이션: 문자열 배열(구버전) → 객체 배열(신버전)
+        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
+          // 구버전 데이터 (문자열 배열)를 신버전으로 변환
+          const migratedItems = parsed.map((name) => ({
+            name,
+            addedAt: getTodayDate(),
+            memo: '',
+            source: 'manual',
+          }))
+          setCabinetItems(migratedItems)
+          // 변환된 데이터 저장
+          localStorage.setItem('cabinetItems', JSON.stringify(migratedItems))
+        } else {
+          // 신버전 데이터 (객체 배열)는 그대로 사용
+          setCabinetItems(parsed)
+        }
       } catch (error) {
         console.error('캐비닛 항목 로드 실패:', error)
-        const defaultItems = [
-          { name: '비타민B군', addedAt: '2025.08.20', memo: '' },
-          { name: '비타민D', addedAt: '2025.08.23', memo: '' },
-          { name: '오메가3', addedAt: '2025.08.21', memo: '' },
-        ]
-        setCabinetItems(defaultItems)
+        setCabinetItems([])
       }
     } else {
-      const defaultItems = [
-        { name: '비타민B군', addedAt: '2025.08.20', memo: '' },
-        { name: '비타민D', addedAt: '2025.08.23', memo: '' },
-        { name: '오메가3', addedAt: '2025.08.21', memo: '' },
-      ]
-      setCabinetItems(defaultItems)
+      setCabinetItems([])
     }
     setIsLoading(false)
   }, [])
