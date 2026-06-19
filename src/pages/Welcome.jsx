@@ -49,34 +49,30 @@ export default function Welcome() {
           </div>
         </div>
       ) : (
-        // 최종 화면 - 로고 + 텍스트를 화면 세로 중앙에 배치
-        <div className="flex-1 flex items-center justify-center w-full">
-          <div className="flex flex-col items-center gap-3">
+        // 최종 화면 - 로고 + 텍스트를 화면 세로 40% 지점에 배치
+        <div className="flex-1 flex flex-col items-center justify-start pt-40 w-full">
+          <div className="flex flex-col items-center gap-3 w-full px-6">
             {/* Logo */}
             <div className="flex items-center gap-3 justify-center">
-              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                <Leaf className="w-6 h-6 text-emerald-600" />
+              <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                <Leaf className="w-8 h-8 text-emerald-600" />
               </div>
-              <span className="text-2xl font-bold text-emerald-700 tracking-tight">MANUGA</span>
+              <span className="text-3xl font-bold text-emerald-700 tracking-tight">MANUGA</span>
             </div>
 
             {/* Text */}
             <p className="text-stone-600 text-base">
               1분이면 충분해요
             </p>
-          </div>
-        </div>
-      )}
 
-      {/* Start Button - 하단 고정 */}
-      {step >= MESSAGES.length && (
-        <div className="fixed bottom-10 left-0 right-0 px-6 max-w-sm mx-auto">
-          <button
-            onClick={() => navigate('/onboarding')}
-            className="w-full py-3 rounded-2xl bg-emerald-600 text-white font-semibold text-base hover:bg-emerald-700 transition-colors"
-          >
-            시작하기
-          </button>
+            {/* Button */}
+            <button
+              onClick={() => navigate('/onboarding')}
+              className="mt-12 w-full py-3 rounded-2xl bg-emerald-600 text-white font-semibold text-base hover:bg-emerald-700 transition-colors"
+            >
+              시작하기
+            </button>
+          </div>
         </div>
       )}
     </div>
