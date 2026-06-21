@@ -90,7 +90,7 @@ export default function AddNutrient() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
                 >
                   {/* Main Row */}
                   <div className="w-full flex items-center gap-3 bg-white rounded-2xl border border-stone-100 px-4 py-3 shadow-sm">
@@ -127,7 +127,7 @@ export default function AddNutrient() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
+                        transition={{ duration: 0.35, ease: "easeOut" }}
                         className="bg-stone-50 border border-t-0 border-stone-100 rounded-b-2xl px-4 py-3 space-y-2.5 overflow-hidden"
                       >
                         <div>

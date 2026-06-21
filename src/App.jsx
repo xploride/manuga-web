@@ -39,7 +39,7 @@ const PageTransition = ({ children }) => {
       initial="initial"
       animate="animate"
       exit="exit"
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
     >
       {children}
     </motion.div>
