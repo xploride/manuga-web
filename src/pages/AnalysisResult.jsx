@@ -1,12 +1,29 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, ChevronRight } from 'lucide-react'
+import { ArrowLeft, ChevronRight, X, Check } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { calculateAnalysis, getCategoryDetails } from '../utils/analysisEngine'
+import { useCabinet } from '../hooks/useCabinet'
+
+const NUTRIENT_MAPPING = {
+  eye: ["루테인", "비타민A"],
+  fatigue: ["마그네슘", "비타민B군"],
+  circulation: ["오메가3"],
+  immunity: ["비타민C", "아연", "비타민D"],
+  digestion: ["유산균"],
+  joints: ["칼슘", "마그네슘"],
+  vitality: ["비타민B군", "마그네슘"],
+  recovery: ["단백질", "마그네슘"],
+  muscle: ["단백질", "아연"],
+}
 
 export default function AnalysisResult() {
   const navigate = useNavigate()
+  const { cabinetItems, addItem } = useCabinet()
   const [analysisData, setAnalysisData] = useState(null)
   const [lastAnalysisDate, setLastAnalysisDate] = useState('-')
+  const [showModal, setShowModal] = useState(false)
+  const [addedItems, setAddedItems] = useState([])
 
   useEffect(() => {
     // localStorage에서 설문 답변 가져오기
@@ -46,6 +63,40 @@ export default function AnalysisResult() {
       }
     }
   }, [])
+
+  const handleAddToCabinet = () => {
+    const newAddedItems = []
+
+    analysisData.categories.forEach((category) => {
+      const mainNutrient = NUTRIENT_MAPPING[category.key]?.[0]
+      if (!mainNutrient) return
+
+      const isAlreadyAdded = cabinetItems.some((item) => item.name === mainNutrient)
+
+      if (!isAlreadyAdded) {
+        const reason = category.reasons?.[0]?.source || ''
+        addItem(mainNutrient, {
+          source: 'analysis',
+          category: category.label,
+          reason: reason,
+        })
+        newAddedItems.push({
+          name: mainNutrient,
+          category: category.label,
+          isNew: true,
+        })
+      } else {
+        newAddedItems.push({
+          name: mainNutrient,
+          category: category.label,
+          isNew: false,
+        })
+      }
+    })
+
+    setAddedItems(newAddedItems)
+    setShowModal(true)
+  }
 
   if (!analysisData) {
     return (
@@ -107,7 +158,7 @@ export default function AnalysisResult() {
         {/* Action Buttons */}
         <div className="space-y-2.5">
           <button
-            onClick={() => navigate('/cabinet')}
+            onClick={handleAddToCabinet}
             className="w-full py-3 rounded-2xl border-2 border-emerald-500 text-emerald-600 font-semibold text-sm hover:bg-emerald-50 transition-colors"
           >
             캐비닛으로 이동
@@ -120,6 +171,93 @@ export default function AnalysisResult() {
           </button>
         </div>
       </div>
+
+      {/* Modal */}
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowModal(false)}
+            className="fixed inset-0 bg-black/50 flex items-end z-50"
+          >
+            <motion.div
+              initial={{ y: 500 }}
+              animate={{ y: 0 }}
+              exit={{ y: 500 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full bg-white rounded-t-3xl p-6 max-w-sm mx-auto"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setShowModal(false)}
+                className="absolute top-4 right-4 text-stone-400 hover:text-stone-600"
+                aria-label="닫기"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Modal Content */}
+              <div className="mt-4">
+                <h3 className="text-lg font-bold text-stone-800 text-center mb-6">
+                  캐비닛에 담겼어요
+                </h3>
+
+                {/* Items List */}
+                <div className="space-y-2.5 mb-6 max-h-64 overflow-y-auto">
+                  {addedItems.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 bg-stone-50 rounded-2xl p-4"
+                    >
+                      {item.isNew ? (
+                        <>
+                          <Check className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-stone-800 text-sm">
+                              {item.name}
+                            </p>
+                            <p className="text-xs text-stone-500 mt-0.5">
+                              {item.category}
+                            </p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                            <Check className="w-5 h-5 text-stone-300" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-stone-500 text-sm">
+                              {item.name}
+                            </p>
+                            <p className="text-xs text-stone-400 mt-0.5">
+                              이미 담겨있어요
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Button */}
+                <button
+                  onClick={() => {
+                    setShowModal(false)
+                    navigate('/cabinet')
+                  }}
+                  className="w-full py-3 rounded-2xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 transition-colors"
+                >
+                  캐비닛 확인하기
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
