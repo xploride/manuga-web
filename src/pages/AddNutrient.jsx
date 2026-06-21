@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Search, X, Check, Plus, ChevronDown, ChevronUp } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useCabinet } from '../hooks/useCabinet'
 import { NUTRIENT_CONTENT } from '../constants/nutrientContent'
 
@@ -75,58 +76,75 @@ export default function AddNutrient() {
 
         {/* Nutrient List */}
         <div className="space-y-2">
-          {visibleCore12.map((name) => {
-            const style = NUTRIENT_STYLE[name]
-            const added = hasItem(name)
-            const isExpanded = expandedNutrient === name
-            const content = NUTRIENT_CONTENT[name]
+          <AnimatePresence>
+            {visibleCore12.map((name) => {
+              const style = NUTRIENT_STYLE[name]
+              const added = hasItem(name)
+              const isExpanded = expandedNutrient === name
+              const content = NUTRIENT_CONTENT[name]
 
-            return (
-              <div key={name} className="overflow-hidden">
-                {/* Main Row */}
-                <div className="w-full flex items-center gap-3 bg-white rounded-2xl border border-stone-100 px-4 py-3 shadow-sm">
-                  <button
-                    onClick={() => setExpandedNutrient(isExpanded ? null : name)}
-                    className="flex-1 flex items-center gap-3"
-                  >
-                    <span className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-lg ${style.bg}`}>
-                      {style.icon}
-                    </span>
-                    <span className="font-medium text-stone-800">{name}</span>
-                  </button>
-                  <button
-                    onClick={() => setExpandedNutrient(isExpanded ? null : name)}
-                    className="text-stone-400 hover:text-stone-600"
-                  >
-                    {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                  </button>
-                  <button
-                    onClick={() => addItem(name, { source: 'manual' })}
-                    disabled={added}
-                    className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
-                      added ? 'bg-emerald-100 text-emerald-600' : 'bg-stone-100 text-stone-500 hover:bg-emerald-100 hover:text-emerald-600'
-                    }`}
-                  >
-                    {added ? <Check className="w-4 h-4" strokeWidth={3} /> : <Plus className="w-4 h-4" />}
-                  </button>
-                </div>
-
-                {/* Expanded Content */}
-                {isExpanded && content && (
-                  <div className="bg-stone-50 border border-t-0 border-stone-100 rounded-b-2xl px-4 py-3 space-y-2.5">
-                    <div>
-                      <p className="text-xs font-semibold text-stone-400 mb-1">설명</p>
-                      <p className="text-sm text-stone-700 leading-relaxed">{content.description}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-stone-400 mb-1">추천 대상</p>
-                      <p className="text-sm text-stone-700 leading-relaxed">{content.forWho}</p>
-                    </div>
+              return (
+                <motion.div
+                  key={name}
+                  className="overflow-hidden"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {/* Main Row */}
+                  <div className="w-full flex items-center gap-3 bg-white rounded-2xl border border-stone-100 px-4 py-3 shadow-sm">
+                    <button
+                      onClick={() => setExpandedNutrient(isExpanded ? null : name)}
+                      className="flex-1 flex items-center gap-3"
+                    >
+                      <span className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-lg ${style.bg}`}>
+                        {style.icon}
+                      </span>
+                      <span className="font-medium text-stone-800">{name}</span>
+                    </button>
+                    <button
+                      onClick={() => setExpandedNutrient(isExpanded ? null : name)}
+                      className="text-stone-400 hover:text-stone-600"
+                    >
+                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={() => addItem(name, { source: 'manual' })}
+                      disabled={added}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors ${
+                        added ? 'bg-emerald-100 text-emerald-600' : 'bg-stone-100 text-stone-500 hover:bg-emerald-100 hover:text-emerald-600'
+                      }`}
+                    >
+                      {added ? <Check className="w-4 h-4" strokeWidth={3} /> : <Plus className="w-4 h-4" />}
+                    </button>
                   </div>
-                )}
-              </div>
-            )
-          })}
+
+                  {/* Expanded Content */}
+                  <AnimatePresence>
+                    {isExpanded && content && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="bg-stone-50 border border-t-0 border-stone-100 rounded-b-2xl px-4 py-3 space-y-2.5 overflow-hidden"
+                      >
+                        <div>
+                          <p className="text-xs font-semibold text-stone-400 mb-1">설명</p>
+                          <p className="text-sm text-stone-700 leading-relaxed">{content.description}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-stone-400 mb-1">추천 대상</p>
+                          <p className="text-sm text-stone-700 leading-relaxed">{content.forWho}</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              )
+            })}
+          </AnimatePresence>
           {visibleCore12.length === 0 && (
             <p className="text-sm text-stone-400 text-center py-6">검색 결과가 없어요</p>
           )}
