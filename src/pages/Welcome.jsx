@@ -21,6 +21,15 @@ export default function Welcome() {
   const [opacity, setOpacity] = useState(0)
 
   useEffect(() => {
+    // 이미 설문을 완료한 사용자는 바로 홈으로 리다이렉트
+    const onboardingAnswers = localStorage.getItem('onboardingAnswers')
+    if (onboardingAnswers) {
+      navigate('/', { replace: true })
+      return
+    }
+  }, [navigate])
+
+  useEffect(() => {
     if (step < MESSAGES.length) {
       setOpacity(0)
       const fadeInTimer = setTimeout(() => setOpacity(1), 50)
