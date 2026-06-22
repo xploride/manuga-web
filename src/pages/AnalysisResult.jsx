@@ -196,7 +196,7 @@ export default function AnalysisResult() {
               return (
                 <div className="space-y-2.5">
                   {top45.map(([name, score], idx) => {
-                    const index = idx + 3
+                    const index = idx + 4
                     const style = NUTRIENT_STYLE[name] || { icon: '💊', bg: 'bg-stone-100', color: 'text-stone-500' }
                     const content = NUTRIENT_CONTENT[name]
                     const reasons = analysisData.allReasons[name] || []

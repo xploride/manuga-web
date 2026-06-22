@@ -120,7 +120,7 @@ export default function Analysis() {
               return (
                 <div className="space-y-2.5">
                   {top45.map(([name], idx) => {
-                    const index = idx + 3
+                    const index = idx + 4
                     const style = NUTRIENT_STYLE[name] || { icon: '💊', bg: 'bg-stone-100', color: 'text-stone-500' }
 
                     return (
