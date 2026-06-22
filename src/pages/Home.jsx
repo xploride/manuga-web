@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Leaf, Bell, Check, Droplet, Pill } from 'lucide-react'
+import { Leaf, Bell, Check, Droplet, Pill, FolderOpen } from 'lucide-react'
 import { useCabinet } from '../hooks/useCabinet'
 
 const NUTRIENT_STYLE = {
@@ -65,11 +65,50 @@ export default function Home() {
     const savedChecks = localStorage.getItem('homeChecks')
     const checks = savedChecks ? JSON.parse(savedChecks) : {}
 
-    const items = cabinetItems.map((item, idx) => ({
-      id: idx,
-      name: item.name,
-      checked: checks[item.name] || false,
-    }))
+    // 그룹 항목 찾기
+    const groupMap = new Map()
+    const individualItems = []
+
+    cabinetItems.forEach((item) => {
+      if (item.groupId) {
+        if (!groupMap.has(item.groupId)) {
+          groupMap.set(item.groupId, {
+            groupId: item.groupId,
+            groupName: item.groupName,
+            items: [],
+          })
+        }
+        groupMap.get(item.groupId).items.push(item)
+      } else {
+        individualItems.push(item)
+      }
+    })
+
+    // homeItems 구성: 그룹 항목 + 개별 항목
+    const items = []
+
+    // 그룹 항목 추가
+    Array.from(groupMap.values()).forEach((group) => {
+      items.push({
+        id: `group-${group.groupId}`,
+        name: group.groupName,
+        isGroup: true,
+        groupId: group.groupId,
+        groupItems: group.items,
+        checked: group.items.every((item) => checks[item.name]),
+      })
+    })
+
+    // 개별 항목 추가
+    individualItems.forEach((item, idx) => {
+      items.push({
+        id: `item-${idx}`,
+        name: item.name,
+        isGroup: false,
+        checked: checks[item.name] || false,
+      })
+    })
+
     setHomeItems(items)
 
     // 스트릭 계산
@@ -80,11 +119,30 @@ export default function Home() {
 
   const toggleHomeItem = (id) => {
     setHomeItems((prev) => {
-      const updated = prev.map((item) => (item.id === id ? { ...item, checked: !item.checked } : item))
+      const updated = prev.map((item) => {
+        if (item.id === id) {
+          // 그룹 항목인 경우
+          if (item.isGroup) {
+            return { ...item, checked: !item.checked }
+          }
+          // 개별 항목인 경우
+          return { ...item, checked: !item.checked }
+        }
+        return item
+      })
+
       // 체크 상태를 localStorage에 저장
       const checks = {}
       updated.forEach((item) => {
-        checks[item.name] = item.checked
+        if (item.isGroup) {
+          // 그룹 항목: 그룹 내 모든 항목의 체크 상태를 같게
+          item.groupItems.forEach((groupItem) => {
+            checks[groupItem.name] = item.checked
+          })
+        } else {
+          // 개별 항목
+          checks[item.name] = item.checked
+        }
       })
       localStorage.setItem('homeChecks', JSON.stringify(checks))
 
@@ -132,28 +190,59 @@ export default function Home() {
         {/* Checklist */}
         <div className="space-y-2.5">
           {homeItems.map((item) => {
-            const style = NUTRIENT_STYLE[item.name] || { bg: "bg-stone-100", color: "text-stone-500" }
-            return (
-              <button
-                key={item.id}
-                onClick={() => toggleHomeItem(item.id)}
-                className="w-full flex items-center gap-3 bg-white rounded-2xl border border-stone-100 px-4 py-3.5 shadow-sm text-left transition-transform active:scale-95"
-              >
-                <span
-                  className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${
-                    item.checked ? 'bg-emerald-500 border-emerald-500' : 'border-stone-300'
-                  }`}
+            if (item.isGroup) {
+              // 그룹 항목
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => toggleHomeItem(item.id)}
+                  className="w-full flex items-center gap-3 bg-white rounded-2xl border border-stone-100 px-4 py-3.5 shadow-sm text-left transition-transform active:scale-95"
                 >
-                  {item.checked && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
-                </span>
-                <span className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-lg ${style.bg}`}>
-                  {style.icon}
-                </span>
-                <span className={`font-medium ${item.checked ? 'text-stone-400 line-through' : 'text-stone-800'}`}>
-                  {item.name}
-                </span>
-              </button>
-            )
+                  <span
+                    className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${
+                      item.checked ? 'bg-emerald-500 border-emerald-500' : 'border-stone-300'
+                    }`}
+                  >
+                    {item.checked && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                  </span>
+                  <span className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                    <FolderOpen className="w-5 h-5 text-emerald-600" />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <span className={`font-medium ${item.checked ? 'text-stone-400 line-through' : 'text-stone-800'}`}>
+                      {item.name}
+                    </span>
+                    <p className="text-xs text-stone-500 mt-0.5 truncate">
+                      {item.groupItems.map((i) => i.name).join(', ')}
+                    </p>
+                  </div>
+                </button>
+              )
+            } else {
+              // 개별 항목
+              const style = NUTRIENT_STYLE[item.name] || { bg: "bg-stone-100", color: "text-stone-500" }
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => toggleHomeItem(item.id)}
+                  className="w-full flex items-center gap-3 bg-white rounded-2xl border border-stone-100 px-4 py-3.5 shadow-sm text-left transition-transform active:scale-95"
+                >
+                  <span
+                    className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${
+                      item.checked ? 'bg-emerald-500 border-emerald-500' : 'border-stone-300'
+                    }`}
+                  >
+                    {item.checked && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                  </span>
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-lg ${style.bg}`}>
+                    {style.icon}
+                  </span>
+                  <span className={`font-medium ${item.checked ? 'text-stone-400 line-through' : 'text-stone-800'}`}>
+                    {item.name}
+                  </span>
+                </button>
+              )
+            }
           })}
         </div>
 
