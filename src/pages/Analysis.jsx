@@ -3,28 +3,19 @@ import { useNavigate } from 'react-router-dom'
 import { FlaskConical, ChevronRight, ArrowLeft } from 'lucide-react'
 import { calculateAnalysis } from '../utils/analysisEngine'
 
-const CATEGORY_STYLES = {
-  eye: { icon: "👁️", bg: "bg-emerald-50", color: "text-emerald-600" },
-  fatigue: { icon: "🌙", bg: "bg-indigo-50", color: "text-indigo-500" },
-  circulation: { icon: "❤️", bg: "bg-rose-50", color: "text-rose-500" },
-  immunity: { icon: "🛡️", bg: "bg-amber-50", color: "text-amber-600" },
-  digestion: { icon: "🔄", bg: "bg-purple-50", color: "text-purple-500" },
-  joints: { icon: "🦴", bg: "bg-blue-50", color: "text-blue-500" },
-  vitality: { icon: "⚡", bg: "bg-cyan-50", color: "text-cyan-600" },
-  recovery: { icon: "💪", bg: "bg-rose-50", color: "text-rose-500" },
-  muscle: { icon: "🏋️", bg: "bg-orange-50", color: "text-orange-500" },
-}
-
-const CATEGORY_LABELS = {
-  eye: "눈 건강",
-  fatigue: "피로 관리",
-  circulation: "혈행 건강",
-  immunity: "면역 관리",
-  digestion: "장 건강",
-  joints: "관절 관리",
-  vitality: "활력 관리",
-  recovery: "운동 회복",
-  muscle: "근육 증가",
+const NUTRIENT_STYLE = {
+  "비타민B군": { icon: "⚡", bg: "bg-emerald-50", color: "text-emerald-600" },
+  "비타민D": { icon: "☀️", bg: "bg-amber-50", color: "text-amber-500" },
+  "오메가3": { icon: "💧", bg: "bg-blue-50", color: "text-blue-500" },
+  "비타민C": { icon: "🍊", bg: "bg-orange-50", color: "text-orange-500" },
+  "루테인": { icon: "👁️", bg: "bg-emerald-50", color: "text-emerald-600" },
+  "유산균": { icon: "💧", bg: "bg-purple-50", color: "text-purple-500" },
+  "마그네슘": { icon: "🌙", bg: "bg-indigo-50", color: "text-indigo-500" },
+  "아연": { icon: "⚡", bg: "bg-cyan-50", color: "text-cyan-600" },
+  "단백질": { icon: "⚡", bg: "bg-rose-50", color: "text-rose-500" },
+  "칼슘": { icon: "💧", bg: "bg-blue-50", color: "text-blue-500" },
+  "비타민A": { icon: "👁️", bg: "bg-emerald-50", color: "text-emerald-600" },
+  "비타민E": { icon: "✨", bg: "bg-yellow-50", color: "text-yellow-500" },
 }
 
 export default function Analysis() {
@@ -62,8 +53,8 @@ export default function Analysis() {
     }
   }, [])
 
-  const handleCategoryClick = (categoryKey) => {
-    navigate(`/analysis/${categoryKey}`)
+  const handleNutrientClick = (nutrientName) => {
+    navigate(`/analysis/${nutrientName}`)
   }
 
   return (
@@ -92,20 +83,25 @@ export default function Analysis() {
           <p className="text-base font-semibold text-emerald-800">{lastAnalysisDate}</p>
         </div>
 
-        {/* Categories - TOP 3 */}
+        {/* Nutrients - TOP 3 */}
         <div className="space-y-2.5 mb-6">
-          {analysisData?.categories.map((category) => {
-            const style = CATEGORY_STYLES[category.key]
+          {analysisData?.nutrients.map((nutrient) => {
+            const style = NUTRIENT_STYLE[nutrient.name] || { icon: '💊', bg: 'bg-stone-100', color: 'text-stone-500' }
             return (
               <button
-                key={category.key}
-                onClick={() => handleCategoryClick(category.key)}
+                key={nutrient.name}
+                onClick={() => handleNutrientClick(nutrient.name)}
                 className="w-full flex items-center gap-3 bg-white rounded-2xl border border-stone-100 px-4 py-3.5 shadow-sm text-left transition-transform active:scale-95"
               >
                 <span className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-lg ${style.bg}`}>
                   {style.icon}
                 </span>
-                <span className="font-medium text-stone-800 flex-1">{category.label}</span>
+                <div className="flex-1 min-w-0">
+                  <span className="font-medium text-stone-800">{nutrient.name}</span>
+                  {nutrient.relatedCategory && (
+                    <p className="text-xs text-stone-400 mt-0.5">{nutrient.relatedCategory}</p>
+                  )}
+                </div>
                 <ChevronRight className="w-4 h-4 text-stone-300" />
               </button>
             )

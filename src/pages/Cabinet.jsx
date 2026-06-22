@@ -53,6 +53,9 @@ export default function Cabinet() {
   }
 
   const wobbleVariants = {
+    initial: {
+      rotate: 0,
+    },
     animate: {
       rotate: [-1, 1, -1],
       transition: {
@@ -156,6 +159,7 @@ export default function Cabinet() {
                   : 'border-stone-100 active:scale-95'
               }`}
               style={{
+                userSelect: 'none',
                 WebkitUserSelect: 'none',
                 WebkitTouchCallout: 'none',
               }}
@@ -197,6 +201,7 @@ export default function Cabinet() {
                   isSelected ? 'bg-emerald-50 border-emerald-300' : 'border-stone-100'
                 } ${isEditMode ? 'active:scale-100' : 'active:scale-95'}`}
                 style={{
+                  userSelect: 'none',
                   WebkitUserSelect: 'none',
                   WebkitTouchCallout: 'none',
                 }}

@@ -60,7 +60,8 @@ export function CabinetProvider({ children }) {
   }, [])
 
   const addItem = (name, metadata = {}) => {
-    if (!cabinetItems.find((item) => item.name === name)) {
+    setCabinetItems(prev => {
+      if (prev.find(item => item.name === name)) return prev
       const newItem = {
         name,
         addedAt: getTodayDate(),
@@ -69,12 +70,13 @@ export function CabinetProvider({ children }) {
         groupId: null,
         groupName: null,
         ...(metadata.category && { category: metadata.category }),
+        ...(metadata.relatedCategory && { relatedCategory: metadata.relatedCategory }),
         ...(metadata.reason && { reason: metadata.reason }),
       }
-      const updatedItems = [...cabinetItems, newItem]
-      setCabinetItems(updatedItems)
-      localStorage.setItem('cabinetItems', JSON.stringify(updatedItems))
-    }
+      const updated = [...prev, newItem]
+      localStorage.setItem('cabinetItems', JSON.stringify(updated))
+      return updated
+    })
   }
 
   const removeItem = (name) => {

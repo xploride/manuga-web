@@ -25,190 +25,177 @@ const NUTRIENT_MAPPING = {
 }
 
 export function calculateAnalysis(answers) {
-  const scores = {
-    eye: 0,
-    fatigue: 0,
-    circulation: 0,
-    immunity: 0,
-    digestion: 0,
-    joints: 0,
-    vitality: 0,
-    recovery: 0,
-    muscle: 0,
+  // 영양소별 점수 및 이유 저장
+  const nutrientScores = {
+    루테인: 0,
+    비타민D: 0,
+    비타민B군: 0,
+    마그네슘: 0,
+    단백질: 0,
+    아연: 0,
+    비타민C: 0,
+    유산균: 0,
+    오메가3: 0,
+    칼슘: 0,
   }
 
-  const reasons = {
-    eye: [],
-    fatigue: [],
-    circulation: [],
-    immunity: [],
-    digestion: [],
-    joints: [],
-    vitality: [],
-    recovery: [],
-    muscle: [],
+  const nutrientReasons = {
+    루테인: [],
+    비타민D: [],
+    비타민B군: [],
+    마그네슘: [],
+    단백질: [],
+    아연: [],
+    비타민C: [],
+    유산균: [],
+    오메가3: [],
+    칼슘: [],
   }
 
-  // 질문 3: 컴퓨터 사용시간 → 눈 건강
+  const addScore = (nutrient, points, reason) => {
+    nutrientScores[nutrient] += points
+    nutrientReasons[nutrient].push({ source: reason, points })
+  }
+
+  // 질문 3: 컴퓨터 사용시간
   const computerTime = answers[3]?.[0]
-  if (computerTime === "4~8시간" || computerTime === "8시간 이상") {
-    scores.eye += 40
-    reasons.eye.push({ source: `컴퓨터 사용시간 ${computerTime}`, points: 40 })
-  } else if (computerTime === "1~4시간") {
-    scores.eye += 20
-    reasons.eye.push({ source: `컴퓨터 사용시간 ${computerTime}`, points: 20 })
+  if (computerTime === "4~8시간") {
+    addScore("루테인", 30, "컴퓨터 사용시간 4~8시간")
+  } else if (computerTime === "8시간 이상") {
+    addScore("루테인", 40, "컴퓨터 사용시간 8시간 이상")
   }
 
-  // 질문 4: 앉아있는 시간 → 혈행 건강, 활력
+  // 질문 4: 앉아있는 시간
   const sittingTime = answers[4]?.[0]
-  if (sittingTime === "6~8시간" || sittingTime === "8시간 이상") {
-    scores.circulation += 30
-    scores.vitality += 20
-    reasons.circulation.push({ source: `앉아있는 시간 ${sittingTime}`, points: 30 })
-    reasons.vitality.push({ source: `앉아있는 시간 ${sittingTime}`, points: 20 })
+  if (sittingTime === "6시간 이상") {
+    addScore("오메가3", 20, "앉아있는 시간 6시간 이상")
   }
 
-  // 질문 5: 걷는 시간 → 혈행, 활력
+  // 질문 5: 걷는 시간
   const walkingTime = answers[5]?.[0]
   if (walkingTime === "30분 이하") {
-    scores.circulation += 20
-    scores.vitality += 20
-    reasons.circulation.push({ source: `걷는 시간 ${walkingTime}`, points: 20 })
-    reasons.vitality.push({ source: `걷는 시간 ${walkingTime}`, points: 20 })
+    addScore("오메가3", 15, "걷는 시간 30분 이하")
   }
 
-  // 질문 6: 햇빛 노출 → 면역 (비타민D)
+  // 질문 6: 햇빛 노출
   const sunExposure = answers[6]?.[0]
-  if (sunExposure === "거의 없음" || sunExposure === "30분 이하") {
-    scores.immunity += 25
-    reasons.immunity.push({ source: `햇빛 노출 ${sunExposure}`, points: 25 })
+  if (sunExposure === "거의 없음") {
+    addScore("비타민D", 50, "햇빛 노출 거의 없음")
+  } else if (sunExposure === "30분 이하") {
+    addScore("비타민D", 30, "햇빛 노출 30분 이하")
   }
 
-  // 질문 7: 신체활용 강도 → 회복, 근육, 피로
-  const activityLevel = answers[7]?.[0]
-  if (activityLevel === "매우높음 (중량물·육체노동)") {
-    scores.recovery += 30
-    scores.muscle += 25
-    reasons.recovery.push({ source: `신체활용 강도 매우높음`, points: 30 })
-    reasons.muscle.push({ source: `신체활용 강도 매우높음`, points: 25 })
-  } else if (activityLevel === "높음") {
-    scores.recovery += 20
-    scores.muscle += 15
-    reasons.recovery.push({ source: `신체활용 강도 높음`, points: 20 })
-    reasons.muscle.push({ source: `신체활용 강도 높음`, points: 15 })
-  }
-
-  // 질문 8: 운동 빈도 → 회복, 활력
+  // 질문 8: 운동 빈도
   const exerciseFreq = answers[8]?.[0]
   if (exerciseFreq === "안함") {
-    scores.vitality += 30
-    reasons.vitality.push({ source: `운동 빈도 ${exerciseFreq}`, points: 30 })
-  } else if (exerciseFreq === "주1~2회") {
-    scores.recovery += 20
-    reasons.recovery.push({ source: `운동 빈도 ${exerciseFreq}`, points: 20 })
+    addScore("비타민B군", 20, "운동 빈도 안함")
   } else if (exerciseFreq === "주3~4회" || exerciseFreq === "주5회 이상") {
-    scores.recovery += 30
-    reasons.recovery.push({ source: `운동 빈도 ${exerciseFreq}`, points: 30 })
+    addScore("단백질", 30, `운동 빈도 ${exerciseFreq}`)
+    addScore("마그네슘", 20, `운동 빈도 ${exerciseFreq}`)
   }
 
   // 질문 9: 건강 목표 (다중선택)
   const goals = answers[9] || []
-  if (goals.includes("눈건강")) {
-    scores.eye += 30
-    reasons.eye.push({ source: "건강 목표: 눈건강", points: 30 })
-  }
   if (goals.includes("운동회복")) {
-    scores.recovery += 30
-    reasons.recovery.push({ source: "건강 목표: 운동회복", points: 30 })
+    addScore("단백질", 30, "건강 목표: 운동회복")
+    addScore("마그네슘", 30, "건강 목표: 운동회복")
   }
   if (goals.includes("근육증가")) {
-    scores.muscle += 30
-    reasons.muscle.push({ source: "건강 목표: 근육증가", points: 30 })
+    addScore("단백질", 50, "건강 목표: 근육증가")
+    addScore("아연", 10, "건강 목표: 근육증가")
   }
   if (goals.includes("면역관리")) {
-    scores.immunity += 30
-    reasons.immunity.push({ source: "건강 목표: 면역관리", points: 30 })
+    addScore("비타민C", 40, "건강 목표: 면역관리")
+    addScore("아연", 20, "건강 목표: 면역관리")
   }
   if (goals.includes("장건강")) {
-    scores.digestion += 30
-    reasons.digestion.push({ source: "건강 목표: 장건강", points: 30 })
+    addScore("유산균", 50, "건강 목표: 장건강")
   }
   if (goals.includes("혈행건강")) {
-    scores.circulation += 30
-    reasons.circulation.push({ source: "건강 목표: 혈행건강", points: 30 })
+    addScore("오메가3", 50, "건강 목표: 혈행건강")
   }
   if (goals.includes("관절관리")) {
-    scores.joints += 30
-    reasons.joints.push({ source: "건강 목표: 관절관리", points: 30 })
+    addScore("칼슘", 40, "건강 목표: 관절관리")
+    addScore("마그네슘", 20, "건강 목표: 관절관리")
   }
   if (goals.includes("활력관리")) {
-    scores.vitality += 30
-    reasons.vitality.push({ source: "건강 목표: 활력관리", points: 30 })
+    addScore("비타민B군", 30, "건강 목표: 활력관리")
+    addScore("마그네슘", 20, "건강 목표: 활력관리")
+  }
+  if (goals.includes("눈건강")) {
+    addScore("루테인", 30, "건강 목표: 눈건강")
   }
 
   // 질문 10: 현재 고민 (다중선택)
   const concerns = answers[10] || []
   if (concerns.includes("눈피로")) {
-    scores.eye += 25
-    reasons.eye.push({ source: "현재 고민: 눈피로", points: 25 })
+    addScore("루테인", 60, "현재 고민: 눈피로")
   }
   if (concerns.includes("만성피로")) {
-    scores.fatigue += 25
-    reasons.fatigue.push({ source: "현재 고민: 만성피로", points: 25 })
+    addScore("비타민B군", 40, "현재 고민: 만성피로")
+    addScore("마그네슘", 30, "현재 고민: 만성피로")
   }
   if (concerns.includes("수면부족")) {
-    scores.fatigue += 25
-    reasons.fatigue.push({ source: "현재 고민: 수면부족", points: 25 })
+    addScore("마그네슘", 40, "현재 고민: 수면부족")
   }
   if (concerns.includes("자고 일어나도 피곤함")) {
-    scores.fatigue += 25
-    reasons.fatigue.push({ source: "현재 고민: 자고 일어나도 피곤함", points: 25 })
+    addScore("마그네슘", 30, "현재 고민: 자고 일어나도 피곤함")
+    addScore("비타민B군", 20, "현재 고민: 자고 일어나도 피곤함")
   }
   if (concerns.includes("근육회복 느림")) {
-    scores.recovery += 25
-    reasons.recovery.push({ source: "현재 고민: 근육회복 느림", points: 25 })
+    addScore("단백질", 40, "현재 고민: 근육회복 느림")
   }
   if (concerns.includes("관절불편")) {
-    scores.joints += 25
-    reasons.joints.push({ source: "현재 고민: 관절불편", points: 25 })
+    addScore("칼슘", 40, "현재 고민: 관절불편")
   }
   if (concerns.includes("장트러블")) {
-    scores.digestion += 25
-    reasons.digestion.push({ source: "현재 고민: 장트러블", points: 25 })
+    addScore("유산균", 40, "현재 고민: 장트러블")
   }
 
-  // 질문 11: 식습관 → 다양한 카테고리
+  // 질문 11: 식습관
   const diet = answers[11]?.[0]
   if (diet === "불규칙함") {
-    scores.immunity += 20
-    scores.digestion += 20
-    reasons.immunity.push({ source: "식습관: 불규칙함", points: 20 })
-    reasons.digestion.push({ source: "식습관: 불규칙함", points: 20 })
+    addScore("비타민C", 20, "식습관: 불규칙함")
+    addScore("유산균", 20, "식습관: 불규칙함")
+  } else if (diet === "배달음식위주") {
+    addScore("비타민C", 15, "식습관: 배달음식위주")
+    addScore("유산균", 15, "식습관: 배달음식위주")
   }
 
-  // 질문 12: 수면 상태 → 피로
+  // 질문 12: 수면 상태
   const sleep = answers[12]?.[0]
   if (sleep === "부족함" || sleep === "매우부족함") {
-    scores.fatigue += 30
-    reasons.fatigue.push({ source: `수면 상태 ${sleep}`, points: 30 })
+    addScore("마그네슘", 30, `수면 상태 ${sleep}`)
   }
 
-  // TOP 3 카테고리 선택
-  const sortedCategories = Object.entries(scores)
-    .sort(([, a], [, b]) => b - a)
+  // TOP 3 영양소 선정
+  const nutrientCategoryMap = {
+    루테인: "눈 건강",
+    비타민D: "면역 관리",
+    비타민B군: "피로 관리, 활력 관리",
+    마그네슘: "피로 관리, 운동 회복, 관절 관리, 활력 관리",
+    단백질: "운동 회복, 근육 증가",
+    아연: "면역 관리, 근육 증가",
+    비타민C: "면역 관리",
+    유산균: "장 건강",
+    오메가3: "혈행 건강",
+    칼슘: "관절 관리",
+  }
+
+  const topNutrients = Object.entries(nutrientScores)
+    .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
     .slice(0, 3)
-    .map(([key, score]) => ({
-      key,
-      label: CATEGORY_SCORES[key],
+    .map(([name, score]) => ({
+      name,
       score,
-      nutrients: NUTRIENT_MAPPING[key] || [],
-      reasons: reasons[key],
+      reasons: nutrientReasons[name],
+      relatedCategory: nutrientCategoryMap[name],
     }))
 
   return {
-    categories: sortedCategories,
-    allScores: scores,
-    reasons,
+    nutrients: topNutrients,
+    allNutrientScores: nutrientScores,
+    allReasons: nutrientReasons,
   }
 }
 

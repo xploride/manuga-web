@@ -1,21 +1,27 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, ChevronRight, X, Check } from 'lucide-react'
+import { ArrowLeft, X, Check } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { calculateAnalysis, getCategoryDetails } from '../utils/analysisEngine'
+import { calculateAnalysis } from '../utils/analysisEngine'
 import { useCabinet } from '../hooks/useCabinet'
+import { NUTRIENT_CONTENT } from '../constants/nutrientContent'
 
-const NUTRIENT_MAPPING = {
-  eye: ["루테인", "비타민A"],
-  fatigue: ["마그네슘", "비타민B군"],
-  circulation: ["오메가3"],
-  immunity: ["비타민C", "아연", "비타민D"],
-  digestion: ["유산균"],
-  joints: ["칼슘", "마그네슘"],
-  vitality: ["비타민B군", "마그네슘"],
-  recovery: ["단백질", "마그네슘"],
-  muscle: ["단백질", "아연"],
+const NUTRIENT_STYLE = {
+  "비타민B군": { icon: "⚡", bg: "bg-emerald-50", color: "text-emerald-600" },
+  "비타민D": { icon: "☀️", bg: "bg-amber-50", color: "text-amber-500" },
+  "오메가3": { icon: "💧", bg: "bg-blue-50", color: "text-blue-500" },
+  "비타민C": { icon: "🍊", bg: "bg-orange-50", color: "text-orange-500" },
+  "루테인": { icon: "👁️", bg: "bg-emerald-50", color: "text-emerald-600" },
+  "유산균": { icon: "💧", bg: "bg-purple-50", color: "text-purple-500" },
+  "마그네슘": { icon: "🌙", bg: "bg-indigo-50", color: "text-indigo-500" },
+  "아연": { icon: "⚡", bg: "bg-cyan-50", color: "text-cyan-600" },
+  "단백질": { icon: "⚡", bg: "bg-rose-50", color: "text-rose-500" },
+  "칼슘": { icon: "💧", bg: "bg-blue-50", color: "text-blue-500" },
+  "비타민A": { icon: "👁️", bg: "bg-emerald-50", color: "text-emerald-600" },
+  "비타민E": { icon: "✨", bg: "bg-yellow-50", color: "text-yellow-500" },
 }
+
+const MEDAL_ICONS = ["🥇", "🥈", "🥉"]
 
 export default function AnalysisResult() {
   const navigate = useNavigate()
@@ -67,28 +73,25 @@ export default function AnalysisResult() {
   const handleAddToCabinet = () => {
     const newAddedItems = []
 
-    analysisData.categories.forEach((category) => {
-      const mainNutrient = NUTRIENT_MAPPING[category.key]?.[0]
-      if (!mainNutrient) return
-
-      const isAlreadyAdded = cabinetItems.some((item) => item.name === mainNutrient)
+    analysisData.nutrients.forEach((nutrient) => {
+      const isAlreadyAdded = cabinetItems.some((item) => item.name === nutrient.name)
 
       if (!isAlreadyAdded) {
-        const reason = category.reasons?.[0]?.source || ''
-        addItem(mainNutrient, {
+        const reason = nutrient.reasons?.[0]?.source || ''
+        addItem(nutrient.name, {
           source: 'analysis',
-          category: category.label,
+          relatedCategory: nutrient.relatedCategory,
           reason: reason,
         })
         newAddedItems.push({
-          name: mainNutrient,
-          category: category.label,
+          name: nutrient.name,
+          relatedCategory: nutrient.relatedCategory,
           isNew: true,
         })
       } else {
         newAddedItems.push({
-          name: mainNutrient,
-          category: category.label,
+          name: nutrient.name,
+          relatedCategory: nutrient.relatedCategory,
           isNew: false,
         })
       }
@@ -131,26 +134,53 @@ export default function AnalysisResult() {
           <p className="text-base font-semibold text-emerald-800">{lastAnalysisDate}</p>
         </div>
 
-        {/* Top 3 Categories */}
-        <p className="text-xs font-semibold text-stone-400 mb-2">추천 카테고리</p>
+        {/* Top 3 Nutrients */}
+        <p className="text-xs font-semibold text-stone-400 mb-2">추천 영양소</p>
         <div className="space-y-2.5 mb-6">
-          {analysisData.categories.map((category, index) => {
-            const details = getCategoryDetails(category.key, category.reasons)
+          {analysisData.nutrients.map((nutrient, index) => {
+            const style = NUTRIENT_STYLE[nutrient.name] || { icon: '💊', bg: 'bg-stone-100', color: 'text-stone-500' }
+            const content = NUTRIENT_CONTENT[nutrient.name]
             return (
-              <button
-                key={category.key}
-                onClick={() => navigate(`/analysis/${category.key}`)}
-                className="w-full flex items-center gap-3 bg-white rounded-2xl border border-stone-100 px-4 py-3.5 shadow-sm text-left transition-transform active:scale-95"
+              <div
+                key={nutrient.name}
+                className={`w-full rounded-2xl border border-stone-100 p-4 shadow-sm ${style.bg}`}
               >
-                <div className="text-lg">{details.icon}</div>
-                <div className="flex-1">
-                  <p className="font-medium text-stone-800">{index + 1}. {category.label}</p>
-                  <p className="text-xs text-stone-400 mt-0.5">
-                    추천: {category.nutrients.join(', ')}
-                  </p>
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="text-2xl">{MEDAL_ICONS[index]}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-lg">{style.icon}</span>
+                      <p className={`font-semibold ${style.color}`}>{nutrient.name}</p>
+                      <span className="text-sm font-medium text-stone-500">({nutrient.score}점)</span>
+                    </div>
+                    {content && (
+                      <p className="text-xs text-stone-600 mt-1">{content.description}</p>
+                    )}
+                  </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-stone-300" />
-              </button>
+
+                {nutrient.reasons && nutrient.reasons.length > 0 && (
+                  <div className="mb-3 ml-11">
+                    <p className="text-xs font-semibold text-stone-600 mb-1.5">추천 이유:</p>
+                    <ul className="space-y-1">
+                      {nutrient.reasons.map((reason, idx) => (
+                        <li key={idx} className="text-xs text-stone-600 flex gap-2">
+                          <span className="text-stone-400">•</span>
+                          <span>{reason.source}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {nutrient.relatedCategory && (
+                  <div className="ml-11">
+                    <p className="text-xs text-stone-500">
+                      <span className="font-medium">관련:</span> {nutrient.relatedCategory}
+                    </p>
+                  </div>
+                )}
+              </div>
             )
           })}
         </div>
@@ -220,7 +250,7 @@ export default function AnalysisResult() {
                               {item.name}
                             </p>
                             <p className="text-xs text-stone-500 mt-0.5">
-                              {item.category}
+                              {item.relatedCategory}
                             </p>
                           </div>
                         </>
