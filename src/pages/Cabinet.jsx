@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import { Pill, Plus, ChevronRight } from 'lucide-react'
+import { Pill, Plus, ChevronRight, Folder } from 'lucide-react'
+import { useMemo } from 'react'
 import { useCabinet } from '../hooks/useCabinet'
 
 const NUTRIENT_STYLE = {
@@ -22,9 +23,39 @@ export default function Cabinet() {
     navigate(`/cabinet/${encodeURIComponent(name)}`)
   }
 
+  const handleGroupClick = (groupId) => {
+    navigate(`/cabinet/group/${groupId}`)
+  }
+
   const handleAddClick = () => {
     navigate('/cabinet/add')
   }
+
+  // 그룹화된 항목과 개별 항목 분리
+  const { groups, individualItems } = useMemo(() => {
+    const groupMap = new Map()
+    const individuals = []
+
+    cabinetItems.forEach((item) => {
+      if (item.groupId) {
+        if (!groupMap.has(item.groupId)) {
+          groupMap.set(item.groupId, {
+            groupId: item.groupId,
+            groupName: item.groupName,
+            items: [],
+          })
+        }
+        groupMap.get(item.groupId).items.push(item)
+      } else {
+        individuals.push(item)
+      }
+    })
+
+    return {
+      groups: Array.from(groupMap.values()),
+      individualItems: individuals,
+    }
+  }, [cabinetItems])
 
   return (
     <>
@@ -41,7 +72,28 @@ export default function Cabinet() {
       {/* Content */}
       <div className="flex-1 px-5 pb-24">
         <div className="space-y-2.5">
-          {cabinetItems.map((item) => {
+          {/* Group Items */}
+          {groups.map((group) => (
+            <button
+              key={group.groupId}
+              onClick={() => handleGroupClick(group.groupId)}
+              className="w-full flex items-center gap-3 bg-white rounded-2xl border border-stone-100 px-4 py-3.5 shadow-sm text-left transition-transform active:scale-95"
+            >
+              <span className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                <Folder className="w-5 h-5 text-emerald-600" />
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-stone-800">{group.groupName}</p>
+                <p className="text-xs text-stone-500 mt-0.5 truncate">
+                  {group.items.map((item) => item.name).join(', ')}
+                </p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
+            </button>
+          ))}
+
+          {/* Individual Items */}
+          {individualItems.map((item) => {
             const style = NUTRIENT_STYLE[item.name] || { icon: "💊", bg: "bg-stone-100", color: "text-stone-500" }
             return (
               <button
@@ -57,6 +109,7 @@ export default function Cabinet() {
               </button>
             )
           })}
+
           {cabinetItems.length === 0 && (
             <p className="text-sm text-stone-400 text-center py-10">담은 영양소가 없어요</p>
           )}

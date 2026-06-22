@@ -8,6 +8,7 @@ import AnalysisResult from './pages/AnalysisResult'
 import AnalysisReport from './pages/AnalysisReport'
 import Cabinet from './pages/Cabinet'
 import CabinetDetail from './pages/CabinetDetail'
+import CabinetGroup from './pages/CabinetGroup'
 import AddNutrient from './pages/AddNutrient'
 import Onboarding from './pages/Onboarding'
 import Welcome from './pages/Welcome'
@@ -102,14 +103,19 @@ function App() {
                           <Cabinet />
                         </PageTransition>
                       } />
-                      <Route path="/cabinet/:nutrientName" element={
-                        <PageTransition>
-                          <CabinetDetail />
-                        </PageTransition>
-                      } />
                       <Route path="/cabinet/add" element={
                         <PageTransition>
                           <AddNutrient />
+                        </PageTransition>
+                      } />
+                      <Route path="/cabinet/group/:groupId" element={
+                        <PageTransition>
+                          <CabinetGroup />
+                        </PageTransition>
+                      } />
+                      <Route path="/cabinet/:nutrientName" element={
+                        <PageTransition>
+                          <CabinetDetail />
                         </PageTransition>
                       } />
                     </Routes>
