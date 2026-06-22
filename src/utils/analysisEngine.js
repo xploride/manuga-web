@@ -28,12 +28,14 @@ export function calculateAnalysis(answers) {
   // 영양소별 점수 및 이유 저장
   const nutrientScores = {
     루테인: 0,
+    비타민A: 0,
     비타민D: 0,
     비타민B군: 0,
     마그네슘: 0,
     단백질: 0,
     아연: 0,
     비타민C: 0,
+    비타민E: 0,
     유산균: 0,
     오메가3: 0,
     칼슘: 0,
@@ -41,12 +43,14 @@ export function calculateAnalysis(answers) {
 
   const nutrientReasons = {
     루테인: [],
+    비타민A: [],
     비타민D: [],
     비타민B군: [],
     마그네슘: [],
     단백질: [],
     아연: [],
     비타민C: [],
+    비타민E: [],
     유산균: [],
     오메가3: [],
     칼슘: [],
@@ -105,25 +109,28 @@ export function calculateAnalysis(answers) {
     addScore("아연", 10, "건강 목표: 근육증가")
   }
   if (goals.includes("면역관리")) {
-    addScore("비타민C", 40, "건강 목표: 면역관리")
-    addScore("아연", 20, "건강 목표: 면역관리")
+    addScore("비타민C", 50, "건강 목표: 면역관리")
+    addScore("아연", 30, "건강 목표: 면역관리")
+    addScore("비타민D", 10, "건강 목표: 면역관리")
   }
   if (goals.includes("장건강")) {
     addScore("유산균", 50, "건강 목표: 장건강")
   }
   if (goals.includes("혈행건강")) {
-    addScore("오메가3", 50, "건강 목표: 혈행건강")
+    addScore("오메가3", 60, "건강 목표: 혈행건강")
+    addScore("비타민E", 20, "건강 목표: 혈행건강")
   }
   if (goals.includes("관절관리")) {
     addScore("칼슘", 40, "건강 목표: 관절관리")
-    addScore("마그네슘", 20, "건강 목표: 관절관리")
+    addScore("오메가3", 20, "건강 목표: 관절관리")
   }
   if (goals.includes("활력관리")) {
     addScore("비타민B군", 30, "건강 목표: 활력관리")
     addScore("마그네슘", 20, "건강 목표: 활력관리")
   }
   if (goals.includes("눈건강")) {
-    addScore("루테인", 30, "건강 목표: 눈건강")
+    addScore("루테인", 50, "건강 목표: 눈건강")
+    addScore("비타민A", 20, "건강 목표: 눈건강")
   }
 
   // 질문 10: 현재 고민 (다중선택)
@@ -152,14 +159,19 @@ export function calculateAnalysis(answers) {
     addScore("유산균", 40, "현재 고민: 장트러블")
   }
 
-  // 질문 11: 식습관
-  const diet = answers[11]?.[0]
-  if (diet === "불규칙함") {
-    addScore("비타민C", 20, "식습관: 불규칙함")
-    addScore("유산균", 20, "식습관: 불규칙함")
-  } else if (diet === "배달음식위주") {
-    addScore("비타민C", 15, "식습관: 배달음식위주")
-    addScore("유산균", 15, "식습관: 배달음식위주")
+  // 질문 11: 식습관 (다중선택)
+  const dietHabits = answers[11] || []
+  if (dietHabits.includes("채소·과일 섭취가 적다")) {
+    addScore("비타민C", 40, "식습관: 채소·과일 섭취가 적다")
+    addScore("비타민A", 20, "식습관: 채소·과일 섭취가 적다")
+  }
+  if (dietHabits.includes("외식·배달 비중이 높다")) {
+    addScore("유산균", 25, "식습관: 외식·배달 비중이 높다")
+    addScore("비타민C", 15, "식습관: 외식·배달 비중이 높다")
+  }
+  if (dietHabits.includes("식사시간이 불규칙하다")) {
+    addScore("비타민B군", 25, "식습관: 식사시간이 불규칙하다")
+    addScore("유산균", 20, "식습관: 식사시간이 불규칙하다")
   }
 
   // 질문 12: 수면 상태
@@ -171,12 +183,14 @@ export function calculateAnalysis(answers) {
   // TOP 3 영양소 선정
   const nutrientCategoryMap = {
     루테인: "눈 건강",
+    비타민A: "눈 건강",
     비타민D: "면역 관리",
     비타민B군: "피로 관리, 활력 관리",
     마그네슘: "피로 관리, 운동 회복, 관절 관리, 활력 관리",
     단백질: "운동 회복, 근육 증가",
     아연: "면역 관리, 근육 증가",
     비타민C: "면역 관리",
+    비타민E: "혈행 건강",
     유산균: "장 건강",
     오메가3: "혈행 건강",
     칼슘: "관절 관리",

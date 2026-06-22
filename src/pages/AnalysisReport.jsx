@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { calculateAnalysis } from '../utils/analysisEngine'
 import { useCabinet } from '../hooks/useCabinet'
 import { NUTRIENT_CONTENT } from '../constants/nutrientContent'
@@ -26,6 +27,8 @@ export default function AnalysisReport() {
   const navigate = useNavigate()
   const { cabinetItems, addItem } = useCabinet()
   const [nutrientsData, setNutrients] = useState([])
+  const [analysisData, setAnalysisData] = useState(null)
+  const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
     const answersStr = localStorage.getItem('onboardingAnswers')
@@ -34,6 +37,7 @@ export default function AnalysisReport() {
         const answers = JSON.parse(answersStr)
         const result = calculateAnalysis(answers)
         setNutrients(result.nutrients)
+        setAnalysisData(result)
       } catch (error) {
         console.error('분석 데이터 로드 실패:', error)
       }
@@ -136,7 +140,94 @@ export default function AnalysisReport() {
               </div>
             )
           })}
+
+          {/* Top 4-5 Nutrients (Expandable) */}
+          <AnimatePresence>
+            {isExpanded && analysisData && (() => {
+              const allNutrients = Object.entries(analysisData.allNutrientScores)
+                .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
+              const top5 = allNutrients.slice(0, 5)
+              const top45 = top5.slice(3)
+
+              return (
+                <div className="space-y-6">
+                  {top45.map(([name, score], idx) => {
+                    const index = idx + 3
+                    const style = NUTRIENT_STYLE[name] || { icon: '💊', bg: 'bg-stone-100', color: 'text-stone-500' }
+                    const content = NUTRIENT_CONTENT[name]
+                    const reasons = analysisData.allReasons[name] || []
+                    const isAdded = cabinetItems.some((item) => item.name === name)
+
+                    return (
+                      <motion.div
+                        key={name}
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.35, ease: "easeOut" }}
+                        className="space-y-3 opacity-80"
+                      >
+                        {/* Nutrient Header with Rank */}
+                        <div className="flex items-center gap-2 mb-4">
+                          <span className="text-2xl">{index}</span>
+                          <span className={`w-9 h-9 rounded-full flex items-center justify-center text-lg ${style.bg}`}>
+                            {style.icon}
+                          </span>
+                          <span className="text-lg font-bold text-stone-800">{name}</span>
+                        </div>
+
+                        {/* Description */}
+                        {content && (
+                          <div className="bg-white rounded-2xl border border-stone-100 p-4 shadow-sm">
+                            <p className="text-sm text-stone-700">{content.description}</p>
+                          </div>
+                        )}
+
+                        {/* Recommendation Reasons */}
+                        {reasons && reasons.length > 0 && (
+                          <div className="bg-white rounded-2xl border border-stone-100 p-4 shadow-sm">
+                            <p className="text-xs font-semibold text-stone-400 mb-2">추천 이유</p>
+                            <div className="space-y-1.5">
+                              {reasons.map((reason, ridx) => (
+                                <p key={ridx} className="text-sm text-stone-700 flex gap-2">
+                                  <span className="text-stone-400">•</span>
+                                  <span>{reason.source}</span>
+                                </p>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Add to Cabinet Button */}
+                        <button
+                          onClick={() => handleAddToCabinet(name, analysisData.nutrients.find(n => n.name === name)?.relatedCategory, reasons)}
+                          disabled={isAdded}
+                          className={`w-full py-3 rounded-2xl font-semibold text-sm transition-colors ${
+                            isAdded
+                              ? 'bg-stone-100 text-stone-400'
+                              : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                          }`}
+                        >
+                          {isAdded ? '캐비닛에 담겨 있어요' : '캐비닛에 담기'}
+                        </button>
+
+                        <div className="border-b border-stone-200 my-2" />
+                      </motion.div>
+                    )
+                  })}
+                </div>
+              )
+            })()}
+          </AnimatePresence>
         </div>
+
+        {/* Expand/Collapse Button */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full py-2.5 rounded-2xl bg-stone-100 text-stone-600 font-medium text-sm hover:bg-stone-200 transition-colors mt-6"
+        >
+          {isExpanded ? "접기" : "더보기"}
+        </button>
       </div>
     </>
   )

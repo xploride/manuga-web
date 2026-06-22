@@ -30,6 +30,7 @@ export default function AnalysisResult() {
   const [lastAnalysisDate, setLastAnalysisDate] = useState('-')
   const [showModal, setShowModal] = useState(false)
   const [addedItems, setAddedItems] = useState([])
+  const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
     // localStorage에서 설문 답변 가져오기
@@ -183,7 +184,75 @@ export default function AnalysisResult() {
               </div>
             )
           })}
+
+          {/* Top 4-5 Nutrients (Expandable) */}
+          <AnimatePresence>
+            {isExpanded && (() => {
+              const allNutrients = Object.entries(analysisData.allNutrientScores)
+                .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
+              const top5 = allNutrients.slice(0, 5)
+              const top45 = top5.slice(3)
+
+              return (
+                <div className="space-y-2.5">
+                  {top45.map(([name, score], idx) => {
+                    const index = idx + 3
+                    const style = NUTRIENT_STYLE[name] || { icon: '💊', bg: 'bg-stone-100', color: 'text-stone-500' }
+                    const content = NUTRIENT_CONTENT[name]
+                    const reasons = analysisData.allReasons[name] || []
+
+                    return (
+                      <motion.div
+                        key={name}
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.35, ease: "easeOut" }}
+                        className={`w-full rounded-2xl border border-stone-100 p-4 shadow-sm opacity-80 ${style.bg}`}
+                      >
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="text-2xl">{index}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-lg">{style.icon}</span>
+                              <p className={`font-semibold ${style.color}`}>{name}</p>
+                              <span className="text-sm font-medium text-stone-500">({score}점)</span>
+                            </div>
+                            {content && (
+                              <p className="text-xs text-stone-600 mt-1">{content.description}</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {reasons && reasons.length > 0 && (
+                          <div className="mb-3 ml-11">
+                            <p className="text-xs font-semibold text-stone-600 mb-1.5">추천 이유:</p>
+                            <ul className="space-y-1">
+                              {reasons.map((reason, ridx) => (
+                                <li key={ridx} className="text-xs text-stone-600 flex gap-2">
+                                  <span className="text-stone-400">•</span>
+                                  <span>{reason.source}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </motion.div>
+                    )
+                  })}
+                </div>
+              )
+            })()}
+          </AnimatePresence>
         </div>
+
+        {/* Expand/Collapse Button */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full py-2.5 rounded-2xl bg-stone-100 text-stone-600 font-medium text-sm hover:bg-stone-200 transition-colors mb-4"
+        >
+          {isExpanded ? "접기" : "더보기"}
+        </button>
 
         {/* Action Buttons */}
         <div className="space-y-2.5">

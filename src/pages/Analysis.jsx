@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FlaskConical, ChevronRight, ArrowLeft } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { calculateAnalysis } from '../utils/analysisEngine'
 
 const NUTRIENT_STYLE = {
@@ -22,6 +23,7 @@ export default function Analysis() {
   const navigate = useNavigate()
   const [analysisData, setAnalysisData] = useState(null)
   const [lastAnalysisDate, setLastAnalysisDate] = useState('-')
+  const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
     // localStorage에서 onboardingAnswers 읽기
@@ -106,7 +108,54 @@ export default function Analysis() {
               </button>
             )
           })}
+
+          {/* Top 4-5 Nutrients (Expandable) */}
+          <AnimatePresence>
+            {isExpanded && (() => {
+              const allNutrients = Object.entries(analysisData.allNutrientScores)
+                .sort(([, scoreA], [, scoreB]) => scoreB - scoreA)
+              const top5 = allNutrients.slice(0, 5)
+              const top45 = top5.slice(3)
+
+              return (
+                <div className="space-y-2.5">
+                  {top45.map(([name], idx) => {
+                    const index = idx + 3
+                    const style = NUTRIENT_STYLE[name] || { icon: '💊', bg: 'bg-stone-100', color: 'text-stone-500' }
+
+                    return (
+                      <motion.button
+                        key={name}
+                        onClick={() => handleNutrientClick(name)}
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.35, ease: "easeOut" }}
+                        className="w-full flex items-center gap-3 bg-white rounded-2xl border border-stone-100 px-4 py-3.5 shadow-sm text-left transition-transform active:scale-95 opacity-80"
+                      >
+                        <span className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-lg font-medium text-stone-600 ${style.bg}`}>
+                          {index}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <span className="font-medium text-stone-800">{name}</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-stone-300" />
+                      </motion.button>
+                    )
+                  })}
+                </div>
+              )
+            })()}
+          </AnimatePresence>
         </div>
+
+        {/* Expand/Collapse Button */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full py-2.5 rounded-2xl bg-stone-100 text-stone-600 font-medium text-sm hover:bg-stone-200 transition-colors mb-4"
+        >
+          {isExpanded ? "접기" : "더보기"}
+        </button>
 
         {/* Action Buttons */}
         <div className="space-y-2.5">
