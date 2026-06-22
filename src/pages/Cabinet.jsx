@@ -39,7 +39,8 @@ export default function Cabinet() {
     navigate('/cabinet/add')
   }
 
-  const handleTouchStart = () => {
+  const handleTouchStart = (e) => {
+    e.preventDefault()
     touchTimerRef.current = setTimeout(() => {
       setIsEditMode(true)
     }, 500)
@@ -49,6 +50,17 @@ export default function Cabinet() {
     if (touchTimerRef.current) {
       clearTimeout(touchTimerRef.current)
     }
+  }
+
+  const wobbleVariants = {
+    animate: {
+      rotate: [-1, 1, -1],
+      transition: {
+        duration: 0.5,
+        repeat: Infinity,
+        ease: 'easeInOut',
+      },
+    },
   }
 
   const handleItemSelect = (name) => {
@@ -131,16 +143,22 @@ export default function Cabinet() {
         <div className="space-y-2.5">
           {/* Group Items */}
           {groups.map((group) => (
-            <button
+            <motion.button
               key={group.groupId}
               onClick={() => handleGroupClick(group.groupId)}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
-              className={`w-full flex items-center gap-3 bg-white rounded-2xl border px-4 py-3.5 shadow-sm text-left transition-all ${
+              variants={wobbleVariants}
+              animate={isEditMode ? 'animate' : 'initial'}
+              className={`w-full flex items-center gap-3 bg-white rounded-2xl border px-4 py-3.5 shadow-sm text-left transition-all select-none touch-none ${
                 isEditMode
                   ? 'border-stone-300 opacity-50 cursor-not-allowed'
                   : 'border-stone-100 active:scale-95'
               }`}
+              style={{
+                WebkitUserSelect: 'none',
+                WebkitTouchCallout: 'none',
+              }}
               disabled={isEditMode}
             >
               <span className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
@@ -153,7 +171,7 @@ export default function Cabinet() {
                 </p>
               </div>
               <ChevronRight className="w-4 h-4 text-stone-300 shrink-0" />
-            </button>
+            </motion.button>
           ))}
 
           {/* Individual Items */}
@@ -162,7 +180,7 @@ export default function Cabinet() {
             const isSelected = selectedItems.has(item.name)
 
             return (
-              <button
+              <motion.button
                 key={item.name}
                 onClick={() => {
                   if (isEditMode) {
@@ -173,9 +191,15 @@ export default function Cabinet() {
                 }}
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
-                className={`w-full flex items-center gap-3 bg-white rounded-2xl border px-4 py-3.5 shadow-sm text-left transition-all ${
+                variants={wobbleVariants}
+                animate={isEditMode ? 'animate' : 'initial'}
+                className={`w-full flex items-center gap-3 bg-white rounded-2xl border px-4 py-3.5 shadow-sm text-left transition-all select-none touch-none ${
                   isSelected ? 'bg-emerald-50 border-emerald-300' : 'border-stone-100'
                 } ${isEditMode ? 'active:scale-100' : 'active:scale-95'}`}
+                style={{
+                  WebkitUserSelect: 'none',
+                  WebkitTouchCallout: 'none',
+                }}
               >
                 {isEditMode && (
                   <div
@@ -191,7 +215,7 @@ export default function Cabinet() {
                 </span>
                 <span className="font-medium text-stone-800 flex-1">{item.name}</span>
                 {!isEditMode && <ChevronRight className="w-4 h-4 text-stone-300" />}
-              </button>
+              </motion.button>
             )
           })}
 
