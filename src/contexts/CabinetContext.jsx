@@ -29,13 +29,25 @@ export function CabinetProvider({ children }) {
             addedAt: getTodayDate(),
             memo: '',
             source: 'manual',
+            groupId: null,
+            groupName: null,
           }))
           setCabinetItems(migratedItems)
           // 변환된 데이터 저장
           localStorage.setItem('cabinetItems', JSON.stringify(migratedItems))
         } else {
           // 신버전 데이터 (객체 배열)는 그대로 사용
-          setCabinetItems(parsed)
+          // groupId와 groupName이 없는 기존 항목들도 마이그레이션
+          const migratedItems = parsed.map((item) => ({
+            ...item,
+            groupId: item.groupId !== undefined ? item.groupId : null,
+            groupName: item.groupName !== undefined ? item.groupName : null,
+          }))
+          setCabinetItems(migratedItems)
+          // 마이그레이션이 필요한 경우 저장
+          if (JSON.stringify(migratedItems) !== JSON.stringify(parsed)) {
+            localStorage.setItem('cabinetItems', JSON.stringify(migratedItems))
+          }
         }
       } catch (error) {
         console.error('캐비닛 항목 로드 실패:', error)
@@ -54,6 +66,8 @@ export function CabinetProvider({ children }) {
         addedAt: getTodayDate(),
         memo: '',
         source: metadata.source || 'manual',
+        groupId: null,
+        groupName: null,
         ...(metadata.category && { category: metadata.category }),
         ...(metadata.reason && { reason: metadata.reason }),
       }
@@ -81,6 +95,41 @@ export function CabinetProvider({ children }) {
     localStorage.setItem('cabinetItems', JSON.stringify(updatedItems))
   }
 
+  const mergeItems = (itemNames, groupName) => {
+    const groupId = `group-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+    const updatedItems = cabinetItems.map((item) => {
+      if (itemNames.includes(item.name)) {
+        return {
+          ...item,
+          groupId,
+          groupName,
+        }
+      }
+      return item
+    })
+
+    setCabinetItems(updatedItems)
+    localStorage.setItem('cabinetItems', JSON.stringify(updatedItems))
+    return groupId
+  }
+
+  const unmergeGroup = (groupId) => {
+    const updatedItems = cabinetItems.map((item) => {
+      if (item.groupId === groupId) {
+        return {
+          ...item,
+          groupId: null,
+          groupName: null,
+        }
+      }
+      return item
+    })
+
+    setCabinetItems(updatedItems)
+    localStorage.setItem('cabinetItems', JSON.stringify(updatedItems))
+  }
+
   return (
     <CabinetContext.Provider
       value={{
@@ -90,6 +139,8 @@ export function CabinetProvider({ children }) {
         removeItem,
         hasItem,
         updateMemo,
+        mergeItems,
+        unmergeGroup,
       }}
     >
       {children}
