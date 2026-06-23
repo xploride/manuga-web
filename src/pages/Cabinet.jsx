@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Pill, Plus, ChevronRight, Folder, X, Check } from 'lucide-react'
+import { Pill, Plus, ChevronRight, X, Check } from 'lucide-react'
 import { useMemo, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCabinet } from '../hooks/useCabinet'
@@ -166,7 +166,7 @@ export default function Cabinet() {
               disabled={isEditMode}
             >
               <span className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                <Folder className="w-5 h-5 text-emerald-600" />
+                <Pill className="w-5 h-5 text-emerald-600" />
               </span>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-stone-800">{group.groupName}</p>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Leaf, Bell, Check, Droplet, Pill, FolderOpen } from 'lucide-react'
+import { Leaf, Bell, Check, Droplet, Pill } from 'lucide-react'
 import { useCabinet } from '../hooks/useCabinet'
 
 const NUTRIENT_STYLE = {
@@ -206,7 +206,7 @@ export default function Home() {
                     {item.checked && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
                   </span>
                   <span className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                    <FolderOpen className="w-5 h-5 text-emerald-600" />
+                    <Pill className="w-5 h-5 text-emerald-600" />
                   </span>
                   <div className="flex-1 min-w-0">
                     <span className={`font-medium ${item.checked ? 'text-stone-400 line-through' : 'text-stone-800'}`}>

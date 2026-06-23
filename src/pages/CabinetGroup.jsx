@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Edit2, Trash2, Check, X } from 'lucide-react'
+import { ArrowLeft, Edit2, Trash2, Check, X, Pill } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useCabinet } from '../hooks/useCabinet'
 
@@ -111,9 +111,14 @@ export default function CabinetGroup() {
             </div>
           ) : (
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-emerald-600 mb-0.5">그룹 이름</p>
-                <p className="text-base font-semibold text-emerald-800">{groupName}</p>
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded-full bg-emerald-200 flex items-center justify-center shrink-0">
+                  <Pill className="w-4 h-4 text-emerald-600" />
+                </span>
+                <div>
+                  <p className="text-xs text-emerald-600 mb-0.5">그룹 이름</p>
+                  <p className="text-base font-semibold text-emerald-800">{groupName}</p>
+                </div>
               </div>
               <button
                 onClick={() => setIsEditing(true)}
