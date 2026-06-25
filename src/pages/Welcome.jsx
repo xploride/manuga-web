@@ -33,8 +33,8 @@ export default function Welcome() {
     if (step < MESSAGES.length) {
       setOpacity(0)
       const fadeInTimer = setTimeout(() => setOpacity(1), 50)
-      const fadeOutTimer = setTimeout(() => setOpacity(0), 2000)
-      const nextTimer = setTimeout(() => setStep(step + 1), 2500)
+      const fadeOutTimer = setTimeout(() => setOpacity(0), 1700)
+      const nextTimer = setTimeout(() => setStep(step + 1), 2100)
 
       return () => {
         clearTimeout(fadeInTimer)
@@ -50,7 +50,7 @@ export default function Welcome() {
         // 메시지 시퀀스만 표시 (버튼 없음)
         <div className="absolute left-0 right-0 px-8 w-full" style={{ top: '37%' }}>
           <div
-            className="text-center transition-opacity duration-500"
+            className="text-center transition-opacity duration-300"
             style={{ opacity }}
           >
             {MESSAGES[step]}

@@ -23,6 +23,21 @@ const NUTRIENT_STYLE = {
 
 const MEDAL_ICONS = ["🥇", "🥈", "🥉"]
 
+const INTAKE_TIPS = {
+  "단백질": "💡 운동 직후 30분 이내 섭취하면 더 좋아요",
+  "마그네슘": "💡 취침 전 섭취하면 더 좋아요",
+  "오메가3": "💡 식후에 섭취하면 더 좋아요",
+  "비타민D": "💡 낮 시간대 식후에 섭취하면 더 좋아요",
+  "비타민C": "💡 식후에 섭취하면 더 좋아요",
+  "비타민B군": "💡 아침 식후에 섭취하면 더 좋아요",
+  "루테인": "💡 지방이 있는 식후에 섭취하면 더 좋아요",
+  "아연": "💡 공복보다 식후에 섭취하면 더 좋아요",
+  "유산균": "💡 공복 또는 식전에 섭취하면 더 좋아요",
+  "칼슘": "💡 마그네슘과 함께 취침 전 섭취하면 더 좋아요",
+  "비타민A": "💡 지방이 있는 식후에 섭취하면 더 좋아요",
+  "비타민E": "💡 식후에 섭취하면 더 좋아요",
+}
+
 export default function AnalysisResult() {
   const navigate = useNavigate()
   const { cabinetItems, addItem } = useCabinet()
@@ -135,6 +150,12 @@ export default function AnalysisResult() {
           <p className="text-base font-semibold text-emerald-800">{lastAnalysisDate}</p>
         </div>
 
+        {/* Encouragement Message */}
+        <div className="mb-6">
+          <h3 className="text-base font-bold text-stone-800 mb-1">생활패턴 분석이 완료됐어요 ❤️</h3>
+          <p className="text-sm text-stone-400">당신의 하루에 맞는 영양소를 추천해드려요</p>
+        </div>
+
         {/* Top 3 Nutrients */}
         <p className="text-xs font-semibold text-stone-400 mb-2">추천 영양소</p>
         <div className="space-y-2.5 mb-6">
@@ -152,7 +173,6 @@ export default function AnalysisResult() {
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-lg">{style.icon}</span>
                       <p className={`font-semibold ${style.color}`}>{nutrient.name}</p>
-                      <span className="text-sm font-medium text-stone-500">({nutrient.score}점)</span>
                     </div>
                     {content && (
                       <p className="text-xs text-stone-600 mt-1">{content.description}</p>
@@ -179,6 +199,12 @@ export default function AnalysisResult() {
                     <p className="text-xs text-stone-500">
                       <span className="font-medium">관련:</span> {nutrient.relatedCategory}
                     </p>
+                  </div>
+                )}
+
+                {INTAKE_TIPS[nutrient.name] && (
+                  <div className="ml-11 mt-2">
+                    <p className="text-xs text-stone-400">{INTAKE_TIPS[nutrient.name]}</p>
                   </div>
                 )}
               </div>
@@ -216,7 +242,6 @@ export default function AnalysisResult() {
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-lg">{style.icon}</span>
                               <p className={`font-semibold ${style.color}`}>{name}</p>
-                              <span className="text-sm font-medium text-stone-500">({score}점)</span>
                             </div>
                             {content && (
                               <p className="text-xs text-stone-600 mt-1">{content.description}</p>
@@ -235,6 +260,12 @@ export default function AnalysisResult() {
                                 </li>
                               ))}
                             </ul>
+                          </div>
+                        )}
+
+                        {INTAKE_TIPS[name] && (
+                          <div className="ml-11 mt-2">
+                            <p className="text-xs text-stone-400">{INTAKE_TIPS[name]}</p>
                           </div>
                         )}
                       </motion.div>

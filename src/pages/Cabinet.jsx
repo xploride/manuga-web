@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Pill, Plus, ChevronRight, X, Check } from 'lucide-react'
-import { useMemo, useState, useRef } from 'react'
+import { useMemo, useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useCabinet } from '../hooks/useCabinet'
 
@@ -23,7 +23,15 @@ export default function Cabinet() {
   const [selectedItems, setSelectedItems] = useState(new Set())
   const [showMergeModal, setShowMergeModal] = useState(false)
   const [groupName, setGroupName] = useState('')
+  const [showTip, setShowTip] = useState(false)
   const touchTimerRef = useRef(null)
+
+  useEffect(() => {
+    const tipShown = localStorage.getItem('cabinetTipShown')
+    if (!tipShown) {
+      setShowTip(true)
+    }
+  }, [])
 
   const handleItemClick = (name) => {
     if (isEditMode) return
@@ -143,6 +151,35 @@ export default function Cabinet() {
 
       {/* Content */}
       <div className="flex-1 px-5 pb-24">
+        {/* Tip */}
+        <AnimatePresence>
+          {showTip && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35 }}
+              className="bg-emerald-50 rounded-2xl p-4 mb-4 flex items-start gap-3 border border-emerald-100"
+            >
+              <span className="text-2xl shrink-0">💊</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-emerald-800 mb-1">여러 영양소를 하나로 합칠 수 있어요</p>
+                <p className="text-xs text-emerald-700">항목을 길게 눌러 편집 모드로 진입하세요</p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowTip(false)
+                  localStorage.setItem('cabinetTipShown', 'true')
+                }}
+                className="text-emerald-600 hover:text-emerald-700 shrink-0 mt-0.5"
+                aria-label="닫기"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="space-y-2.5">
           {/* Group Items */}
           {groups.map((group) => (

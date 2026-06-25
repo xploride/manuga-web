@@ -20,6 +20,21 @@ const NUTRIENT_STYLE = {
   "비타민E": { icon: "✨", bg: "bg-yellow-50", color: "text-yellow-500" },
 }
 
+const INTAKE_TIPS = {
+  "단백질": "💡 운동 직후 30분 이내 섭취하면 더 좋아요",
+  "마그네슘": "💡 취침 전 섭취하면 더 좋아요",
+  "오메가3": "💡 식후에 섭취하면 더 좋아요",
+  "비타민D": "💡 낮 시간대 식후에 섭취하면 더 좋아요",
+  "비타민C": "💡 식후에 섭취하면 더 좋아요",
+  "비타민B군": "💡 아침 식후에 섭취하면 더 좋아요",
+  "루테인": "💡 지방이 있는 식후에 섭취하면 더 좋아요",
+  "아연": "💡 공복보다 식후에 섭취하면 더 좋아요",
+  "유산균": "💡 공복 또는 식전에 섭취하면 더 좋아요",
+  "칼슘": "💡 마그네슘과 함께 취침 전 섭취하면 더 좋아요",
+  "비타민A": "💡 지방이 있는 식후에 섭취하면 더 좋아요",
+  "비타민E": "💡 식후에 섭취하면 더 좋아요",
+}
+
 export default function AnalysisDetail() {
   const { nutrientName } = useParams()
   const navigate = useNavigate()
@@ -143,6 +158,13 @@ export default function AnalysisDetail() {
             <p className="text-xs text-stone-500">
               <span className="font-medium">관련:</span> {relatedCategory}
             </p>
+          </div>
+        )}
+
+        {/* Intake Tip */}
+        {INTAKE_TIPS[nutrientName] && (
+          <div className="bg-stone-50 rounded-2xl p-3 mb-6">
+            <p className="text-xs text-stone-400">{INTAKE_TIPS[nutrientName]}</p>
           </div>
         )}
 

@@ -83,7 +83,7 @@ function App() {
                           <Analysis />
                         </PageTransition>
                       } />
-                      <Route path="/analysis/:categoryKey" element={
+                      <Route path="/analysis/:nutrientName" element={
                         <PageTransition>
                           <AnalysisDetail />
                         </PageTransition>

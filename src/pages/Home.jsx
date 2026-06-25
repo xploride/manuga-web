@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Leaf, Bell, Check, Droplet, Pill } from 'lucide-react'
+import { Leaf, Bell, Check, Droplet, Pill, X } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useCabinet } from '../hooks/useCabinet'
 
 const NUTRIENT_STYLE = {
@@ -59,6 +60,7 @@ export default function Home() {
   const { cabinetItems } = useCabinet()
   const [homeItems, setHomeItems] = useState([])
   const [streakDays, setStreakDays] = useState(0)
+  const [showCongratulations, setShowCongratulations] = useState(false)
 
   // 캐비닛 항목이 변경될 때 및 마운트될 때 초기화
   useEffect(() => {
@@ -158,6 +160,17 @@ export default function Home() {
           // 스트릭 재계산
           const streak = calculateStreak(streakDates)
           setStreakDays(streak)
+        }
+      }
+
+      // 모든 항목이 체크되었는지 확인
+      const allChecked = updated.length > 0 && updated.every((item) => item.checked)
+      if (allChecked) {
+        const today = getTodayDateString()
+        const shownToday = localStorage.getItem(`congratulationShown-${today}`)
+        if (!shownToday) {
+          setShowCongratulations(true)
+          localStorage.setItem(`congratulationShown-${today}`, 'true')
         }
       }
 
@@ -266,6 +279,51 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Congratulations Modal */}
+      <AnimatePresence>
+        {showCongratulations && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowCongratulations(false)}
+            className="fixed inset-0 bg-black/50 flex items-end z-50"
+          >
+            <motion.div
+              initial={{ y: 500 }}
+              animate={{ y: 0 }}
+              exit={{ y: 500 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full bg-white rounded-t-3xl p-6 max-w-sm mx-auto"
+            >
+              <div className="text-center">
+                {/* Emoji */}
+                <div className="text-6xl mb-4">🎉</div>
+
+                {/* Title */}
+                <h3 className="text-lg font-bold text-stone-800 mb-2">
+                  오늘의 영양제를 모두 챙겼어요!
+                </h3>
+
+                {/* Subtitle */}
+                <p className="text-sm text-stone-500 mb-6">
+                  건강한 하루를 보내셨네요 👏
+                </p>
+
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowCongratulations(false)}
+                  className="w-full py-3 rounded-2xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 transition-colors"
+                >
+                  닫기
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
